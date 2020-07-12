@@ -1427,7 +1427,7 @@ void CServer::CreateOtherMuteStateChanged ( const int  iCurChanID,
     }
 }
 
-int CServer::GetFreeChan( int seed )
+int CServer::GetFreeChan( int seed ) /*s*/
 {
     // look for a free channel
     for ( int i = seed; i < iMaxNumChannels; i++ )
