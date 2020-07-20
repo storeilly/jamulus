@@ -1332,6 +1332,11 @@ void CServer::CreateAndSendChanListForAllConChannels()
             // send message
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
 /*s*/            Logging.LogMessage( QString::number(i) + ":" + vecChannels[i].GetName() );
+//            PutIniSetting ( IniXMLDocument, "clientlist", "clientip",
+//                ToBase64 ( pClient->vecWindowPosMain ) );
+           QMap<QString, int> map;
+           map[]
+
         }
     }
 
