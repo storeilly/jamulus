@@ -55,6 +55,8 @@ public:
 
     void AddNewConnection ( const QHostAddress& ClientInetAddr,
                             const int           iNumberOfConnectedClients );
+    void AddDisconnection ( const QHostAddress& ClientInetAddr );
+    void LogMessage ( const QString& strMessage );
 
 protected:
     void operator<< ( const QString& sNewStr );

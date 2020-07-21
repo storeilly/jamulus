@@ -1,5 +1,5 @@
 VERSION = 3.5.9
-
+# with sormods
 # use target name which does not use a captital letter at the beginning
 contains(CONFIG, "noupcasename") {
     message(The target name is jamulus instead of Jamulus.)

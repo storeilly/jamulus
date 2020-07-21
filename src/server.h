@@ -275,7 +275,7 @@ protected:
     void StartStatusHTMLFileWriting ( const QString& strNewFileName,
                                       const QString& strNewServerNameWithPort );
 
-    int GetFreeChan();
+    int GetFreeChan( int seed );
     int FindChannel ( const CHostAddress& CheckAddr );
     int GetNumberOfConnectedClients();
     CVector<CChannelInfo> CreateChannelList();

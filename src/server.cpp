@@ -661,6 +661,11 @@ void CServer::OnNewConnection ( int          iChID,
 
     // logging of new connected channel
     Logging.AddNewConnection ( RecHostAddr.InetAddr, GetNumberOfConnectedClients() );
+        QString logline = "";
+        logline += "+[" + QString::number(iChID) +"]" ;
+        logline += ":" + RecHostAddr.InetAddr.toString();
+        logline += ":" + QString::number(RecHostAddr.iPort);
+        Logging.LogMessage( logline );
 }
 
 void CServer::OnServerFull ( CHostAddress RecHostAddr )
@@ -1303,6 +1308,7 @@ void CServer::CreateAndSendChanListForAllConChannels()
         {
             // send message
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
+/*s*/            Logging.LogMessage( QString::number(i) + ":" + vecChannels[i].GetName() );
         }
     }
 
@@ -1378,10 +1384,10 @@ void CServer::CreateOtherMuteStateChanged ( const int  iCurChanID,
     }
 }
 
-int CServer::GetFreeChan()
+int CServer::GetFreeChan( int seed )
 {
     // look for a free channel
-    for ( int i = 0; i < iMaxNumChannels; i++ )
+    for ( int i = seed; i < iMaxNumChannels; i++ )
     {
         if ( !vecChannels[i].IsConnected() )
         {
@@ -1472,7 +1478,7 @@ bool CServer::PutAudioData ( const CVector<uint8_t>& vecbyRecBuf,
         if ( iCurChanID == INVALID_CHANNEL_ID )
         {
             // a new client is calling, look for free channel
-            iCurChanID = GetFreeChan();
+            iCurChanID = GetFreeChan( 0 );
 
             if ( iCurChanID != INVALID_CHANNEL_ID )
             {
