@@ -700,6 +700,14 @@ void CServer::OnCLDisconnection ( CHostAddress InetAddr )
 
     if ( iCurChanID != INVALID_CHANNEL_ID )
     {
+        if ( vecChannels[iCurChanID].IsConnected() )
+        {
+            QString logline = "";
+            logline += "+[" + QString::number(iCurChanID) +"]" ;
+            logline += ":" + InetAddr.InetAddr.toString();
+            logline += ":" + QString::number(InetAddr.iPort);
+            Logging.LogMessage( logline );
+        }
         vecChannels[iCurChanID].Disconnect();
     }
 }
