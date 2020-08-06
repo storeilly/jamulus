@@ -320,21 +320,21 @@
         <item>
          <widget class="QCheckBox" name="chbLocalMute">
           <property name="text">
-           <string>Mute Myself</string>
+           <string>&amp;Mute Myself</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="chbSettings">
           <property name="text">
-           <string>Settings</string>
+           <string>&amp;Settings</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="chbChat">
           <property name="text">
-           <string>Chat</string>
+           <string>C&amp;hat</string>
           </property>
          </widget>
         </item>

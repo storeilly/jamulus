@@ -30,6 +30,10 @@
 #include <QHostAddress>
 #include <QFileInfo>
 #include <algorithm>
+#ifdef USE_MULTITHREADING
+# include <QtConcurrent>
+# include <QFutureSynchronizer>
+#endif
 #ifdef USE_OPUS_SHARED_LIB
 # include "opus/opus_custom.h"
 #else
@@ -301,13 +305,9 @@ protected:
 
     void WriteHTMLChannelList();
 
-    void ProcessData ( const CVector<CVector<int16_t> >& vecvecsData,
-                       const CVector<double>&            vecdGains,
-                       const CVector<double>&            vecdPannings,
-                       const CVector<int>&               vecNumAudioChannels,
-                       CVector<int16_t>&                 vecsOutData,
-                       const int                         iCurNumAudChan,
-                       const int                         iNumClients );
+    void MixEncodeTransmitData ( const int iChanCnt,
+                                 const int iCurChanID,
+                                 const int iNumClients );
 
     virtual void customEvent ( QEvent* pEvent );
 
@@ -353,6 +353,7 @@ protected:
     CVector<int>               vecUseDoubleSysFraSizeConvBuf;
     CVector<EAudComprType>     vecAudioComprType;
     CVector<CVector<int16_t> > vecvecsSendData;
+    CVector<CVector<double> >  vecvecsIntermediateProcBuf;
     CVector<CVector<uint8_t> > vecvecbyCodedData;
 
     // Channel levels
@@ -456,10 +457,8 @@ public slots:
     void OnCLReqVersionAndOS ( CHostAddress InetAddr )
         { ConnLessProtocol.CreateCLVersionAndOSMes ( InetAddr ); }
 
-    // the CreateChannelList() function access vecChannels which as to be mutexed
-    // since the normal server thread my change that at a random time
     void OnCLReqConnClientsList ( CHostAddress InetAddr )
-        { QMutexLocker locker ( &Mutex ); ConnLessProtocol.CreateCLConnClientsListMes ( InetAddr, CreateChannelList() ); }
+        { ConnLessProtocol.CreateCLConnClientsListMes ( InetAddr, CreateChannelList() ); }
 
     void OnCLRegisterServerReceived ( CHostAddress    InetAddr,
                                       CHostAddress    LInetAddr,

@@ -8,13 +8,9 @@ contains(CONFIG, "noupcasename") {
 
 # support multi-threading with OMP if requested
 contains(CONFIG, "multithreading") {
-    unix {
-        message(The OpenMP multithreading is enabled.)
-        message(NOTE THAT THE OpenMP IMPLEMENTATION IS STILL EXPERIMENTAL AND MAY NOT BE STABLE.)
-        DEFINES += USE_OMP
-        QMAKE_CXXFLAGS += -fopenmp
-        QMAKE_LFLAGS += -fopenmp
-    }
+    message(Multithreading in the server is enabled.)
+    DEFINES += USE_MULTITHREADING
+    QT += concurrent
 }
 
 CONFIG += qt \
@@ -733,6 +729,8 @@ DISTFILES += ChangeLog \
     src/res/instruments/vocaltenor.png \
     src/res/instruments/vocalalto.png \
     src/res/instruments/vocalsoprano.png \
+    src/res/instruments/vocalbaritone.png \
+    src/res/instruments/vocallead.png \
     src/res/instruments/banjo.png \
     src/res/instruments/mandolin.png \
     src/res/flags/flagnone.png \
