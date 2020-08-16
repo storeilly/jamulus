@@ -1,4 +1,4 @@
-VERSION = 3.5.9s
+VERSION = 3.5.10s
 # with sormods
 
 # use target name which does not use a captital letter at the beginning
