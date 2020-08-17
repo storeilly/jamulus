@@ -1,6 +1,7 @@
 VERSION = 3.5.10s
 # with sormods
 
+TARGET = Jamulus35a-s
 # use target name which does not use a captital letter at the beginning
 contains(CONFIG, "noupcasename") {
     message(The target name is jamulus instead of Jamulus.)
@@ -13,7 +14,7 @@ contains(CONFIG, "multithreading") {
     message(NOTE THAT THE MULTITHREADING IMPLEMENTATION IS STILL EXPERIMENTAL AND MAY NOT BE STABLE.)
     DEFINES += USE_MULTITHREADING
     QT += concurrent
-    TARGET = Jamulus-MT
+    TARGET = JamulusMT
 }
 
 CONFIG += qt \
