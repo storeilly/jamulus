@@ -169,10 +169,8 @@ CClient::CClient ( const quint16  iPortNumber,
     QObject::connect ( &ConnLessProtocol, &CProtocol::CLDisconnection ,
         this, &CClient::OnCLDisconnection );
 
-#ifdef ENABLE_CLIENT_VERSION_AND_OS_DEBUGGING
     QObject::connect ( &ConnLessProtocol, &CProtocol::CLVersionAndOSReceived,
         this, &CClient::CLVersionAndOSReceived );
-#endif
 
     QObject::connect ( &ConnLessProtocol, &CProtocol::CLChannelLevelListReceived,
         this, &CClient::CLChannelLevelListReceived );
@@ -190,6 +188,8 @@ CClient::CClient ( const quint16  iPortNumber,
     QObject::connect ( pSignalHandler, &CSignalHandler::HandledSignal,
         this, &CClient::OnHandledSignal );
 
+    // start timer so that elapsed time works
+    PreciseTime.start();
 
     // start the socket (it is important to start the socket after all
     // initializations and connections)

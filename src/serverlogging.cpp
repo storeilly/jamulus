@@ -83,7 +83,7 @@ void CServerLogging::LogMessage ( const QString& strMessage )
 
 void CServerLogging::AddServerStopped()
 {
-    const QString strLogStr = CurTimeDatetoLogString() + ",, server stopped "
+    const QString strLogStr = CurTimeDatetoLogString() + ",, server idling "
         "-------------------------------------";
 
     QTextStream& tsConsoleStream = *( ( new ConsoleWriterFactory() )->get() );

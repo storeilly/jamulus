@@ -1,10 +1,33 @@
 
 
 
+<<<<<<< HEAD
 3.5.10git <- NOTE: the release version number will be 3.5.11
 
 TODO improve multithreading
 TODO use command line argument to enable multithreading instead of qmake CONFIG
+=======
+
+3.5.10git <- NOTE: the release version number will be 3.5.11
+
+- support a check for updates (#370)
+
+- added an optional server list whitelist filter (#413)
+
+- added a command line argument to enable multithreading in the server
+
+- store recorder settings, coded by pljones (#313)
+
+- accessibility improvements, coded by chigkim (#498, #512)
+
+- added Jack audio audio latency calculation, coded by bflamig (#437)
+
+- bug fix: crash when using the Jack backend and quickly reconfiguring, coded by hselasky (#543)
+
+- bug fix: Alt+h shortcut to open the Chat dialog did not work, use Alt+c instead
+
+
+>>>>>>> master
 
 
 
@@ -34,7 +57,7 @@ TODO use command line argument to enable multithreading instead of qmake CONFIG
 
 - accessibility improvements, coded by chigkim (#499, #510, #514)
 
-- bug fix: added more mutex in the server (should fix #480)
+- bug fix: fixed a stability issue in the server (should fix #480)
 
 - bug fix: --showallservers ping column sort is alphabetic (#201)
 
@@ -183,7 +206,7 @@ TODO use command line argument to enable multithreading instead of qmake CONFIG
 
 - new command line option -d to disconnect all clients on shutdown of the server (#161)
 
-- bug fix: for mono capture jack audio interface Jamulus complains it
+- bug fix: for mono capture Jack audio interface Jamulus complains it
   cannot make connections (#137)
 
 - bug fix: fixed that Jamulus segfaults when jackd is restarted (#122, #127)

@@ -26,6 +26,7 @@
 
 #include <QThread>
 #include <QString>
+#include <QMutex>
 #ifndef HEADLESS
 # include <QMessageBox>
 #endif
@@ -132,11 +133,12 @@ protected:
 
     // these functions should be overwritten by derived class for
     // non callback based audio interfaces
-    virtual bool Read  ( CVector<int16_t>& ) { printf ( "no sound!" ); return false; }
-    virtual bool Write ( CVector<int16_t>& ) { printf ( "no sound!" ); return false; }
+    virtual bool Read  ( CVector<int16_t>& ) { return false; }
+    virtual bool Write ( CVector<int16_t>& ) { return false; }
 
-    void run();
-    bool bRun;
+    void   run();
+    bool   bRun;
+    QMutex MutexAudioProcessCallback;
 
     void             ParseMIDIMessage ( const CVector<uint8_t>& vMIDIPaketBytes );
 
