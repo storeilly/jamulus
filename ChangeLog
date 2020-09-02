@@ -1,12 +1,6 @@
 
 
 
-<<<<<<< HEAD
-3.5.10git <- NOTE: the release version number will be 3.5.11
-
-TODO improve multithreading
-TODO use command line argument to enable multithreading instead of qmake CONFIG
-=======
 
 3.5.10git <- NOTE: the release version number will be 3.5.11
 
@@ -27,7 +21,6 @@ TODO use command line argument to enable multithreading instead of qmake CONFIG
 - bug fix: Alt+h shortcut to open the Chat dialog did not work, use Alt+c instead
 
 
->>>>>>> master
 
 
 

@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 VERSION = 3.5.10s
 # with sormods
-=======
-VERSION = 3.5.10git
->>>>>>> master
 
 TARGET = Jamulus35a-s
 # use target name which does not use a captital letter at the beginning
@@ -12,18 +8,6 @@ contains(CONFIG, "noupcasename") {
     TARGET = jamulus
 }
 
-<<<<<<< HEAD
-# support multi-threading with OMP if requested
-contains(CONFIG, "multithreading") {
-    message(Multithreading in the server is enabled.)
-    message(NOTE THAT THE MULTITHREADING IMPLEMENTATION IS STILL EXPERIMENTAL AND MAY NOT BE STABLE.)
-    DEFINES += USE_MULTITHREADING
-    QT += concurrent
-    TARGET = JamulusMT
-}
-
-=======
->>>>>>> master
 CONFIG += qt \
     thread \
     release

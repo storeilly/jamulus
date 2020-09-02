@@ -1329,7 +1329,8 @@ void CServer::CreateAndSendChanListForAllConChannels()
         {
             // send message
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
-/*s*/            Logging.LogMessage( QString::number(i) + ":" + vecChannels[i].GetName() );
+/*s*/            Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetName() );
+/*s*/ //                 Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
         }
     }
 
