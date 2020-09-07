@@ -533,6 +533,8 @@ int main ( int argc, char** argv )
 #endif
     }
 
+
+    // Dependencies ------------------------------------------------------------
 #ifdef HEADLESS
     if ( bUseGUI )
     {
@@ -545,8 +547,12 @@ int main ( int argc, char** argv )
     Q_UNUSED ( bMuteStream )           // avoid compiler warnings
 #endif
 
+    // the inifile is not supported for the headless server mode
+    if ( !bIsClient && !bUseGUI && !strIniFileName.isEmpty() )
+    {
+        tsConsole << "No initialization file support in headless server mode." << endl;
+    }
 
-    // Dependencies ------------------------------------------------------------
     // per definition: if we are in "GUI" server mode and no central server
     // address is given, we use the default central server address
     if ( !bIsClient && bUseGUI && strCentralServer.isEmpty() )
@@ -766,7 +772,8 @@ QString UsageArguments ( char **argv )
         "Usage: " + QString ( argv[0] ) + " [option] [optional argument]\n"
         "\nRecognized options:\n"
         "  -h, -?, --help        display this help text and exit\n"
-        "  -i, --inifile         initialization file name\n"
+        "  -i, --inifile         initialization file name (not\n"
+        "                        supported for headless server mode)\n"
         "  -n, --nogui           disable GUI\n"
         "  -p, --port            set your local port number\n"
         "  -t, --notranslation   disable translation (use englisch language)\n"
