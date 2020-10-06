@@ -222,6 +222,7 @@ void CHighPrecisionTimer::run()
 CServer::CServer ( const int          iNewMaxNumChan,
                    const QString&     strLoggingFileName,
                    const quint16      iPortNumber,
+                   const quint16      iNewPosPortNumber,
                    const QString&     strHTMLStatusFileName,
                    const QString&     strServerNameForHTMLStatusFile,
                    const QString&     strCentralServer,
@@ -237,6 +238,7 @@ CServer::CServer ( const int          iNewMaxNumChan,
                    const ELicenceType eNLicenceType ) :
     bUseDoubleSystemFrameSize   ( bNUseDoubleSystemFrameSize ),
     bUseMultithreading          ( bNUseMultithreading ),
+    iPosPortNumber              ( iNewPosPortNumber ),
     iMaxNumChannels             ( iNewMaxNumChan ),
     Socket                      ( this, iPortNumber ),
     Logging                     ( ),
@@ -1403,16 +1405,22 @@ void CServer::CreateOtherMuteStateChanged ( const int  iCurChanID,
     }
 }
 
-int CServer::GetFreeChan()
+int CServer::GetFreeChan( const int seed )
 {
-    // look for a free channel
-    for ( int i = 0; i < iMaxNumChannels; i++ )
+    // look for the first free channel starting from seed position
+    for ( int i = seed; i < iMaxNumChannels; i++ )
     {
         if ( !vecChannels[i].IsConnected() )
         {
             return i;
         }
+        if ( i >= iMaxNumChannels and seed != 0 )
+        {
+            // a free channel has not been found when starting from seed, we will search once starting from 0
+        return GetFreeChan( 0 );
+        }
     }
+
 
     // no free channel found, return invalid ID
     return INVALID_CHANNEL_ID;
@@ -1507,7 +1515,14 @@ bool CServer::PutAudioData ( const CVector<uint8_t>& vecbyRecBuf,
     if ( iCurChanID == INVALID_CHANNEL_ID )
     {
         // a new client is calling, look for free channel
-        iCurChanID = GetFreeChan();
+        if ( iPosPortNumber > 0  and HostAdr.iPort >= iPosPortNumber  and HostAdr.iPort <= ( iPosPortNumber + iMaxNumChannels ) )
+        {
+            iCurChanID = GetFreeChan( HostAdr.iPort );
+        }
+        else
+        {
+            iCurChanID = GetFreeChan( 0 );
+        }
 
         if ( iCurChanID != INVALID_CHANNEL_ID )
         {

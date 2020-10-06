@@ -74,9 +74,11 @@ int main ( int argc, char** argv )
     bool         bNoAutoJackConnect          = false;
     bool         bUseTranslation             = true;
     bool         bCustomPortNumberGiven      = false;
+    bool         bPositionPortGiven          = false;
     int          iNumServerChannels          = DEFAULT_USED_NUM_CHANNELS;
     int          iCtrlMIDIChannel            = INVALID_MIDI_CH;
     quint16      iPortNumber                 = DEFAULT_PORT_NUMBER;
+    quint16      iPosPortNumber              = 0;
     ELicenceType eLicenceType                = LT_NO_LICENCE;
     QString      strConnOnStartupAddress     = "";
     QString      strIniFileName              = "";
@@ -326,6 +328,25 @@ int main ( int argc, char** argv )
             iPortNumber            = static_cast<quint16> ( rDbleArgument );
             bCustomPortNumberGiven = true;
             tsConsole << "- selected port number: " << iPortNumber << endl;
+            CommandLineOptions << "--port";
+            continue;
+        }
+
+
+        // Fader Position start port number ------------------------------------
+        if ( GetNumericArgument ( tsConsole,
+                                  argc,
+                                  argv,
+                                  i,
+                                  "-k",
+                                  "--position",
+                                  0,
+                                  65535,
+                                  rDbleArgument ) )
+        {
+            iPosPortNumber         = static_cast<quint16> ( rDbleArgument );
+            bPositionPortGiven     = true;
+            tsConsole << "- fader positon port number: " << iPosPortNumber << endl;
             CommandLineOptions << "--port";
             continue;
         }
@@ -691,6 +712,7 @@ int main ( int argc, char** argv )
             CServer Server ( iNumServerChannels,
                              strLoggingFileName,
                              iPortNumber,
+                             iPosPortNumber,
                              strHTMLStatusFileName,
                              strServerName,
                              strCentralServer,

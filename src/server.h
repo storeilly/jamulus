@@ -172,6 +172,7 @@ public:
     CServer ( const int          iNewMaxNumChan,
               const QString&     strLoggingFileName,
               const quint16      iPortNumber,
+              const quint16      iNewPosPortNumber,
               const QString&     strHTMLStatusFileName,
               const QString&     strServerNameForHTMLStatusFile,
               const QString&     strCentralServer,
@@ -279,7 +280,7 @@ protected:
     void StartStatusHTMLFileWriting ( const QString& strNewFileName,
                                       const QString& strNewServerNameWithPort );
 
-    int GetFreeChan();
+    int GetFreeChan( const int seed );
     int FindChannel ( const CHostAddress& CheckAddr );
     int GetNumberOfConnectedClients();
     CVector<CChannelInfo> CreateChannelList();
@@ -331,6 +332,7 @@ protected:
     // copy constructor/operator
     CChannel                   vecChannels[MAX_NUM_CHANNELS];
     int                        iMaxNumChannels;
+    int                        iPosPortNumber;
     CProtocol                  ConnLessProtocol;
     QMutex                     Mutex;
     QMutex                     MutexWelcomeMessage;
