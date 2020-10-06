@@ -347,7 +347,7 @@ int main ( int argc, char** argv )
             iPosPortNumber         = static_cast<quint16> ( rDbleArgument );
             bPositionPortGiven     = true;
             tsConsole << "- fader positon port number: " << iPosPortNumber << endl;
-            CommandLineOptions << "--port";
+            CommandLineOptions << "--position";
             continue;
         }
 
