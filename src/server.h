@@ -271,6 +271,12 @@ public:
     void SetAutoRunMinimized ( const bool NAuRuMin ) { bAutoRunMinimized = NAuRuMin; }
     bool GetAutoRunMinimized() { return bAutoRunMinimized; }
 
+    /*s*/
+    std::map<QString, int> USRnames;
+    std::map<QString, int> USRipaddresses;
+    std::map<QString, QString> USRipname;
+
+
 protected:
     // access functions for actual channels
     bool IsConnected ( const int iChanNum )

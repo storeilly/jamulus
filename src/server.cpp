@@ -663,11 +663,15 @@ void CServer::OnNewConnection ( int          iChID,
 
     // logging of new connected channel
     Logging.AddNewConnection ( RecHostAddr.InetAddr, GetNumberOfConnectedClients() );
-        QString logline = "";
-        logline += "+[" + QString::number(iChID) +"]" ;
-        logline += ":" + RecHostAddr.InetAddr.toString();
-        logline += ":" + QString::number(RecHostAddr.iPort);
-        Logging.LogMessage( logline );
+/*s*/
+    QString logline = "";
+    QString IPaddress = "" ;
+    logline += "+[" + QString::number(iChID) +"]" ;               // +[x]
+    logline += ":" + RecHostAddr.InetAddr.toString();             // :x.x.x.x
+    logline += ":" + QString::number(RecHostAddr.iPort);          // :21234
+    Logging.LogMessage( logline );
+//  /*s*/ /*s*/ /*s*/  USRnames.insert(make_pair(IPaddress, "name"));
+
 }
 
 void CServer::OnServerFull ( CHostAddress RecHostAddr )
@@ -1340,9 +1344,11 @@ void CServer::CreateAndSendChanListForAllConChannels()
         if ( vecChannels[i].IsConnected() )
         {
             // send message
+            QString straddress;
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
+            Logging.LogMessage( "<" + vecChannels[i].GetAddress().toString()  + ">");           /*s*/ /* this gets the ip address and port */
 /*s*/            Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetName() );
-/*s*/ //                 Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
+/*/ /*s*/ /*this here both ip and name*/ /*s*/           // Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
         }
     }
 
@@ -1523,6 +1529,25 @@ bool CServer::PutAudioData ( const CVector<uint8_t>& vecbyRecBuf,
     {
         // a new client is calling, look for free channel
         iCurChanID = GetFreeChan(0);
+        QString namehere;
+        namehere = vecChannels[iCurChanID].GetName();
+
+        if ( QString::compare(namehere.left(1), "s", Qt::CaseInsensitive) )
+        {
+            iCurChanID = GetFreeChan(10);
+        }
+        if ( QString::compare(namehere.left(1), "a", Qt::CaseInsensitive) )
+        {
+            iCurChanID = GetFreeChan(20);
+        }
+        if ( QString::compare(namehere.left(1), "t", Qt::CaseInsensitive) )
+        {
+            iCurChanID = GetFreeChan(30);
+        }
+        if ( QString::compare(namehere.left(1), "b", Qt::CaseInsensitive) )
+        {
+            iCurChanID = GetFreeChan(40);
+        }  /*s*/ /* I know this won't work cause the chan is empty at this point */
 
         if ( iCurChanID != INVALID_CHANNEL_ID )
         {
