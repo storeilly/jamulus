@@ -28,9 +28,8 @@
 /* Implementation *************************************************************/
 CClientSettingsDlg::CClientSettingsDlg ( CClient*         pNCliP,
                                          CClientSettings* pNSetP,
-                                         QWidget*         parent,
-                                         Qt::WindowFlags  f ) :
-    QDialog   ( parent, f ),
+                                         QWidget*         parent ) :
+    QDialog   ( parent ),
     pClient   ( pNCliP ),
     pSettings ( pNSetP )
 {
@@ -193,12 +192,6 @@ CClientSettingsDlg::CClientSettingsDlg ( CClient*         pNCliP,
 
     cbxSkin->setAccessibleName ( tr ( "Skin combo box" ) );
 
-    // display channel levels
-    chbDisplayChannelLevels->setWhatsThis ( "<b>" + tr ( "Display Channel Levels" ) + ":</b> " +
-        tr ( "If enabled, each client channel will display a pre-fader level bar." ) );
-
-    chbDisplayChannelLevels->setAccessibleName ( tr ( "Display channel levels check box" ) );
-
     // audio channels
     QString strAudioChannels = "<b>" + tr ( "Audio Channels" ) + ":</b> " + tr (
         "Selects the number of audio channels to be used for communication between "
@@ -317,9 +310,6 @@ CClientSettingsDlg::CClientSettingsDlg ( CClient*         pNCliP,
     // init sound card channel selection frame
     UpdateSoundChannelSelectionFrame();
 
-    // Display Channel Levels check box
-    chbDisplayChannelLevels->setCheckState ( pClient->GetDisplayChannelLevels() ? Qt::Checked : Qt::Unchecked );
-
     // Audio Channels combo box
     cbxAudioChannels->clear();
     cbxAudioChannels->addItem ( tr ( "Mono" ) );               // CC_MONO
@@ -385,9 +375,6 @@ CClientSettingsDlg::CClientSettingsDlg ( CClient*         pNCliP,
         this, &CClientSettingsDlg::OnNetBufServerValueChanged );
 
     // check boxes
-    QObject::connect ( chbDisplayChannelLevels, &QCheckBox::stateChanged,
-        this, &CClientSettingsDlg::OnDisplayChannelLevelsStateChanged );
-
     QObject::connect ( chbAutoJitBuf, &QCheckBox::stateChanged,
         this, &CClientSettingsDlg::OnAutoJitBufStateChanged );
 
@@ -664,12 +651,6 @@ void CClientSettingsDlg::OnEnableOPUS64StateChanged ( int value )
 {
     pClient->SetEnableOPUS64 ( value == Qt::Checked );
     UpdateDisplay();
-}
-
-void CClientSettingsDlg::OnDisplayChannelLevelsStateChanged ( int value )
-{
-    pClient->SetDisplayChannelLevels ( value != Qt::Unchecked );
-    emit DisplayChannelLevelsChanged();
 }
 
 void CClientSettingsDlg::OnCentralServerAddressEditingFinished()

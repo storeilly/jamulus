@@ -127,9 +127,6 @@ public:
     EGUIDesign GetGUIDesign() const { return eGUIDesign; }
     void       SetGUIDesign ( const EGUIDesign eNGD ) { eGUIDesign = eNGD; }
 
-    bool GetDisplayChannelLevels() const { return bDisplayChannelLevels; }
-    void SetDisplayChannelLevels ( const bool bNDCL );
-
     EAudioQuality GetAudioQuality() const { return eAudioQuality; }
     void SetAudioQuality ( const EAudioQuality eNAudioQuality );
 
@@ -243,10 +240,10 @@ public:
 
     void SetMuteOutStream ( const bool bDoMute ) { bMuteOutStream = bDoMute; }
 
-    void SetRemoteChanGain ( const int iId, const double dGain, const bool bIsMyOwnFader );
+    void SetRemoteChanGain ( const int iId, const float fGain, const bool bIsMyOwnFader );
 
-    void SetRemoteChanPan ( const int iId, const double dPan )
-        { Channel.SetRemoteChanPan ( iId, dPan ); }
+    void SetRemoteChanPan ( const int iId, const float fPan )
+        { Channel.SetRemoteChanPan ( iId, fPan ); }
 
     void SetRemoteInfo() { Channel.SetRemoteInfo ( ChannelInfo ); }
 
@@ -323,7 +320,7 @@ protected:
     int                     iNumAudioChannels;
     bool                    bIsInitializationPhase;
     bool                    bMuteOutStream;
-    double                  dMuteOutStreamGain;
+    float                   fMuteOutStreamGain;
     CVector<unsigned char>  vecCeltData;
 
     CHighPrioSocket         Socket;
@@ -342,8 +339,8 @@ protected:
 
     bool                    bSndCrdConversionBufferRequired;
     int                     iSndCardMonoBlockSizeSamConvBuff;
-    CBufferBase<int16_t>    SndCrdConversionBufferIn;
-    CBufferBase<int16_t>    SndCrdConversionBufferOut;
+    CBuffer<int16_t>        SndCrdConversionBufferIn;
+    CBuffer<int16_t>        SndCrdConversionBufferOut;
     CVector<int16_t>        vecDataConvBuf;
     CVector<int16_t>        vecsStereoSndCrdMuteStream;
     CVector<int16_t>        vecZeros;
@@ -356,7 +353,6 @@ protected:
     int                     iStereoBlockSizeSam;
 
     EGUIDesign              eGUIDesign;
-    bool                    bDisplayChannelLevels;
     bool                    bEnableOPUS64;
 
     bool                    bJitterBufferOK;

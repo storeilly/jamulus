@@ -472,7 +472,7 @@ void CChannelFader::SendFaderLevelToServer ( const double dLevel,
                                           ( !bOtherChannelIsSolo || IsSolo() ) );
 
     // emit signal for new fader gain value
-    emit gainValueChanged ( MathUtils::CalcFaderGain ( dLevel ),
+    emit gainValueChanged ( MathUtils::CalcFaderGain ( static_cast<float> ( dLevel ) ),
                             bIsMyOwnFader,
                             bIsGroupUpdate,
                             bSuppressServerUpdate,
@@ -489,7 +489,7 @@ void CChannelFader::SendFaderLevelToServer ( const double dLevel,
 
 void CChannelFader::SendPanValueToServer ( const int iPan )
 {
-    emit panValueChanged ( static_cast<double> ( iPan ) / AUD_MIX_PAN_MAX );
+    emit panValueChanged ( static_cast<float> ( iPan ) / AUD_MIX_PAN_MAX );
 }
 
 void CChannelFader::OnPanValueChanged ( int value )
@@ -809,7 +809,7 @@ void CChannelFader::SetChannelInfos ( const CChannelInfo& cChanInfo )
 /******************************************************************************\
 * CAudioMixerBoard                                                             *
 \******************************************************************************/
-CAudioMixerBoard::CAudioMixerBoard ( QWidget* parent, Qt::WindowFlags ) :
+CAudioMixerBoard::CAudioMixerBoard ( QWidget* parent ) :
     QGroupBox       ( parent ),
     pSettings       ( nullptr ),
     bDisplayPans    ( false ),
@@ -877,10 +877,10 @@ inline void CAudioMixerBoard::connectFaderSignalsToMixerBoardSlots()
 {
     int iCurChanID = slotId - 1;
 
-    void ( CAudioMixerBoard::* pGainValueChanged )( double, bool, bool, bool, double ) =
+    void ( CAudioMixerBoard::* pGainValueChanged )( float, bool, bool, bool, double ) =
         &CAudioMixerBoardSlots<slotId>::OnChGainValueChanged;
 
-    void ( CAudioMixerBoard::* pPanValueChanged )( double ) =
+    void ( CAudioMixerBoard::* pPanValueChanged )( float ) =
         &CAudioMixerBoardSlots<slotId>::OnChPanValueChanged;
 
     QObject::connect ( vecpChanFader[iCurChanID], &CChannelFader::soloStateChanged,
@@ -938,22 +938,6 @@ void CAudioMixerBoard::SetGUIDesign ( const EGUIDesign eNewDesign )
     }
 }
 
-void CAudioMixerBoard::SetDisplayChannelLevels ( const bool eNDCL )
-{
-    bDisplayChannelLevels = eNDCL;
-
-    // only update hiding the levels immediately, showing the levels
-    // is only applied if the server actually transmits levels
-    if ( !bDisplayChannelLevels )
-    {
-        // hide all level meters
-        for ( int i = 0; i < MAX_NUM_CHANNELS; i++ )
-        {
-            vecpChanFader[i]->SetDisplayChannelLevel ( false );
-        }
-    }
-}
-
 void CAudioMixerBoard::SetDisplayPans ( const bool eNDP )
 {
     bDisplayPans = eNDP;
@@ -1000,6 +984,8 @@ void CAudioMixerBoard::HideAll()
 void CAudioMixerBoard::ChangeFaderOrder ( const bool        bDoSort,
                                           const EChSortType eChSortType )
 {
+    QMutexLocker locker ( &Mutex );
+
     // create a pair list of lower strings and fader ID for each channel
     QList<QPair<QString, int> > PairList;
 
@@ -1030,7 +1016,7 @@ void CAudioMixerBoard::ChangeFaderOrder ( const bool        bDoSort,
     // if requested, sort the channels
     if ( bDoSort )
     {
-        qStableSort ( PairList.begin(), PairList.end() );
+        std::stable_sort ( PairList.begin(), PairList.end() );
     }
 
     // add channels to the layout in the new order (since we insert on the left, we
@@ -1048,7 +1034,7 @@ void CAudioMixerBoard::UpdateTitle()
 
     if ( eRecorderState == RS_RECORDING )
     {
-        strTitlePrefix = "[" + tr ( "RECORDING ACTIVE" )  + "] ";
+        strTitlePrefix = "[" + tr ( "RECORDING ACTIVE" ) + "] ";
     }
 
     setTitle ( strTitlePrefix + tr ( "Personal Mix at: " ) + strServerName );
@@ -1064,6 +1050,8 @@ void CAudioMixerBoard::SetRecorderState ( const ERecorderState newRecorderState 
 
 void CAudioMixerBoard::ApplyNewConClientList ( CVector<CChannelInfo>& vecChanInfo )
 {
+    QMutexLocker locker ( &Mutex );
+
     // we want to set the server name only if the very first faders appear
     // in the audio mixer board to show a "try to connect" before
     if ( bNoFaderVisible )
@@ -1115,6 +1103,13 @@ void CAudioMixerBoard::ApplyNewConClientList ( CVector<CChannelInfo>& vecChanInf
                         vecpChanFader[i]->SetFaderLevel (
                             pSettings->iNewClientFaderLevel / 100.0 * AUD_MIX_FADER_MAX );
                     }
+
+                    // per definition: a fader for a new client shall always be inserted at
+                    // the right-hand-side (#673), note that it is not required to remove the
+                    // widget from the layout first but it is moved to the new position automatically
+                    // and also note that the last layout item is the spacer, therefore we have
+                    // to insert at position "count - 2"
+                    pMainLayout->insertWidget ( pMainLayout->count() - 2, vecpChanFader[i]->GetMainWidget() );
                 }
 
                 // restore gain (if new name is different from the current one)
@@ -1223,7 +1218,7 @@ void CAudioMixerBoard::UpdateSoloStates()
 }
 
 void CAudioMixerBoard::UpdateGainValue ( const int    iChannelIdx,
-                                         const double dValue,
+                                         const float  fValue,
                                          const bool   bIsMyOwnFader,
                                          const bool   bIsGroupUpdate,
                                          const bool   bSuppressServerUpdate,
@@ -1232,7 +1227,7 @@ void CAudioMixerBoard::UpdateGainValue ( const int    iChannelIdx,
     // update current gain
     if ( !bSuppressServerUpdate )
     {
-        emit ChangeChanGain ( iChannelIdx, dValue, bIsMyOwnFader );
+        emit ChangeChanGain ( iChannelIdx, fValue, bIsMyOwnFader );
     }
 
     // if this fader is selected, all other in the group must be updated as
@@ -1256,10 +1251,10 @@ void CAudioMixerBoard::UpdateGainValue ( const int    iChannelIdx,
     }
 }
 
-void CAudioMixerBoard::UpdatePanValue ( const int    iChannelIdx,
-                                        const double dValue )
+void CAudioMixerBoard::UpdatePanValue ( const int   iChannelIdx,
+                                        const float fValue )
 {
-    emit ChangeChanPan ( iChannelIdx, dValue );
+    emit ChangeChanPan ( iChannelIdx, fValue );
 }
 
 void CAudioMixerBoard::StoreFaderSettings ( CChannelFader* pChanFader )
@@ -1358,7 +1353,7 @@ void CAudioMixerBoard::SetChannelLevels ( const CVector<uint16_t>& vecChannelLev
 
             // show level only if we successfully received levels from the
             // server (if server does not support levels, do not show levels)
-            if ( bDisplayChannelLevels && !vecpChanFader[iChId]->GetDisplayChannelLevel() )
+            if ( !vecpChanFader[iChId]->GetDisplayChannelLevel() )
             {
                 vecpChanFader[iChId]->SetDisplayChannelLevel ( true );
             }

@@ -80,8 +80,7 @@ public:
                  const bool       bNewShowComplRegConnList,
                  const bool       bShowAnalyzerConsole,
                  const bool       bMuteStream,
-                 QWidget*         parent = nullptr,
-                 Qt::WindowFlags  f = nullptr );
+                 QWidget*         parent = nullptr );
 
 protected:
     void               SetGUIDesign ( const EGUIDesign eNewDesign );
@@ -176,11 +175,11 @@ public slots:
     void OnChatTextReceived ( QString strChatText );
     void OnLicenceRequired ( ELicenceType eLicenceType );
 
-    void OnChangeChanGain ( int iId, double dGain, bool bIsMyOwnFader )
-        { pClient->SetRemoteChanGain ( iId, dGain, bIsMyOwnFader ); }
+    void OnChangeChanGain ( int iId, float fGain, bool bIsMyOwnFader )
+        { pClient->SetRemoteChanGain ( iId, fGain, bIsMyOwnFader ); }
 
-	void OnChangeChanPan ( int iId, double dPan )
-        { pClient->SetRemoteChanPan ( iId, dPan ); }
+    void OnChangeChanPan ( int iId, float fPan )
+        { pClient->SetRemoteChanPan ( iId, fPan ); }
 
     void OnNewLocalInputText ( QString strChatText )
         { pClient->CreateChatTextMes ( strChatText ); }
@@ -223,9 +222,6 @@ public slots:
     void OnDisconnected() { Disconnect(); }
     void OnCentralServerAddressTypeChanged();
     void OnGUIDesignChanged() { SetGUIDesign ( pClient->GetGUIDesign() ); }
-
-    void OnDisplayChannelLevelsChanged()
-        { MainMixerBoard->SetDisplayChannelLevels ( pClient->GetDisplayChannelLevels() ); }
 
     void OnRecorderStateReceived ( ERecorderState eRecorderState )
         { MainMixerBoard->SetRecorderState ( eRecorderState ); }

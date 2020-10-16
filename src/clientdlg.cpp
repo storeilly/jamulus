@@ -33,17 +33,16 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
                          const bool       bNewShowComplRegConnList,
                          const bool       bShowAnalyzerConsole,
                          const bool       bMuteStream,
-                         QWidget*         parent,
-                         Qt::WindowFlags  f ) :
-    QDialog             ( parent, f ),
+                         QWidget*         parent ) :
+    QDialog             ( parent ),
     pClient             ( pNCliP ),
     pSettings           ( pNSetP ),
     bConnectDlgWasShown ( false ),
     bMIDICtrlUsed       ( iCtrlMIDIChannel != INVALID_MIDI_CH ),
-    ClientSettingsDlg   ( pNCliP, pNSetP, parent, Qt::Window ),
-    ChatDlg             ( parent, Qt::Window ),
-    ConnectDlg          ( pNCliP, bNewShowComplRegConnList, parent, Qt::Dialog ),
-    AnalyzerConsole     ( pNCliP, parent, Qt::Window ),
+    ClientSettingsDlg   ( pNCliP, pNSetP, parent ),
+    ChatDlg             ( parent ),
+    ConnectDlg          ( pNCliP, bNewShowComplRegConnList, parent ),
+    AnalyzerConsole     ( pNCliP, parent ),
     MusicianProfileDlg  ( pNCliP, parent )
 {
     setupUi ( this );
@@ -183,9 +182,6 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
 
     // reset mixer board
     MainMixerBoard->HideAll();
-
-    // restore channel level display preference
-    MainMixerBoard->SetDisplayChannelLevels ( pClient->GetDisplayChannelLevels() );
 
     // init status label
     OnTimerStatus();
@@ -455,9 +451,6 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
 
     QObject::connect ( &ClientSettingsDlg, &CClientSettingsDlg::GUIDesignChanged,
         this, &CClientDlg::OnGUIDesignChanged );
-
-    QObject::connect ( &ClientSettingsDlg, &CClientSettingsDlg::DisplayChannelLevelsChanged,
-        this, &CClientDlg::OnDisplayChannelLevelsChanged );
 
     QObject::connect ( &ClientSettingsDlg, &CClientSettingsDlg::AudioChannelsChanged,
         this, &CClientDlg::OnAudioChannelsChanged );
