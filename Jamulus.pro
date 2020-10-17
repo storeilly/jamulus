@@ -1,11 +1,12 @@
 VERSION = 3.5.12git
 
 contains(CONFIG, "versioninfo") {
-    GIT_CURRENT_SHA1=$$system(git describe --tags)
-    VERSION = $$VERSION-s
     message(Using custom target and version)
-    TARGET = $$TARGET-$$VERSION-$$GIT_CURRENT_SHA1
-    message(Target name is $$TARGET)
+    GIT_CURRENT_SHA1=$$system(git describe --tags)
+    VERSION = $$VERSION-$$GIT_CURRENT_SHA1
+    TARGET = $$TARGET-$$VERSION
+    message(Version is $$VERSION)
+    message(Target is $$TARGET)
 }
 
 # use target name which does not use a captital letter at the beginning
