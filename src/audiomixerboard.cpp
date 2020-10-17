@@ -995,9 +995,15 @@ void CAudioMixerBoard::ChangeFaderOrder ( const bool        bDoSort,
         {
             PairList << QPair<QString, int> ( vecpChanFader[i]->GetReceivedName().toLower(), i );
         }
-        else if ( eChSortType ==  ST_BY_INSTRUMENT )
+        else if ( eChSortType == ST_BY_CITY )
         {
-            PairList << QPair<QString, int> ( CInstPictures::GetName ( vecpChanFader[i]->GetReceivedInstrument() ), i );
+            PairList << QPair<QString, int> ( vecpChanFader[i]->GetReceivedCity().toLower(), i );
+        }
+        else if ( eChSortType == ST_BY_INSTRUMENT )
+        {
+            // sort first "by instrument" and second "by name" by adding the name after the instrument
+            PairList << QPair<QString, int> ( CInstPictures::GetName ( vecpChanFader[i]->GetReceivedInstrument() ) +
+                                              vecpChanFader[i]->GetReceivedName().toLower(), i );
         }
         else // ST_BY_GROUPID
         {
