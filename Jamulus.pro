@@ -1,6 +1,6 @@
 VERSION = 3.5.12git
 
-# use target name which does not use a captital letter at the beginning
+# use target name which does not use a capital letter at the beginning
 contains(CONFIG, "noupcasename") {
     message(The target name is jamulus instead of Jamulus.)
     TARGET = jamulus
@@ -9,8 +9,8 @@ contains(CONFIG, "noupcasename") {
 #allow detailed version info in target executable
 contains(CONFIG, "versioninfo") {
     message(Using custom target and version)
-    GIT_CURRENT_SHA1=$$system(git describe --tags)
-    VERSION = $$VERSION-$$GIT_CURRENT_SHA1
+    GIT_CURRENT_SHA1=$$system(git describe --tags --abbrev)
+    VERSION = $$VERSION-s-$$GIT_CURRENT_SHA1
     TARGET = $$TARGET-$$VERSION
     message(Version is $$VERSION)
     message(Target is $$TARGET)
