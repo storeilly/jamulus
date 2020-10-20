@@ -74,9 +74,17 @@ void CServerLogging::LogMessage ( const QString& strMessage )
     const QString strLogStr = CurTimeDatetoLogString() + ", " +
         strMessage + ":";
 
+    //prevent logging of same message multiple times
+    static QString strLastMessage;
+
+    if ( not QString::compare(strLastMessage, strLogStr, Qt::CaseSensitive) )
+    {
     QTextStream& tsConsoleStream = *( ( new ConsoleWriterFactory() )->get() );
     tsConsoleStream << strLogStr << endl; // on console
     *this << strLogStr; // in log file
+
+    strLastMessage = strLogStr;
+    }
 }
 
 
