@@ -1381,8 +1381,9 @@ void CServer::CreateAndSendChanListForAllConChannels()
             QString straddress;
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
             Logging.LogMessage( "<" + vecChannels[i].GetAddress().toString()  + ">");           /*s*/ /* this gets the ip address and port */
-/*s*/            Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetName() );
-/*/ /*s*/ /*this here both ip and name*/ /*s*/           // Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
+/*s*/
+            Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetName() );
+/*s*/ /*this here both ip and name*/ /*s*/           // Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
         }
     }
 
@@ -1562,11 +1563,14 @@ bool CServer::PutAudioData ( const CVector<uint8_t>& vecbyRecBuf,
     if ( iCurChanID == INVALID_CHANNEL_ID )
     {
         // a new client is calling, look for free channel
-        iCurChanID = GetFreeChan(0);
+        iCurChanID = GetFreeChan( 0 );
         QString namehere;
         namehere = vecChannels[iCurChanID].GetName();
 
-        if ( QString::compare(namehere.left(1), "s", Qt::CaseInsensitive) )
+/*s
+ *
+ *
+ *         if ( QString::compare(namehere.left(1), "s", Qt::CaseInsensitive) )
         {
             iCurChanID = GetFreeChan(10);
         }
@@ -1581,7 +1585,9 @@ bool CServer::PutAudioData ( const CVector<uint8_t>& vecbyRecBuf,
         if ( QString::compare(namehere.left(1), "b", Qt::CaseInsensitive) )
         {
             iCurChanID = GetFreeChan(40);
-        }  /*s*/ /* I know this won't work cause the chan is empty at this point */
+        }
+  */
+/*s*/ /* I know this won't work cause the chan is empty at this point */
 
         if ( iCurChanID != INVALID_CHANNEL_ID )
         {

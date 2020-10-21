@@ -70,21 +70,24 @@ void CServerLogging::AddDisconnection ( const QHostAddress& ClientInetAddr )
 
 void CServerLogging::LogMessage ( const QString& strMessage )
 {
+    //prevent logging of same message multiple times
+    static QString strLastMessage;
+    int compResult;
+
     // logging of generic string message
     const QString strLogStr = CurTimeDatetoLogString() + ", " +
         strMessage + ":";
 
-    //prevent logging of same message multiple times
-    static QString strLastMessage;
+    compResult = QString::compare(strLastMessage, strMessage, Qt::CaseSensitive);
 
-    if ( not QString::compare(strLastMessage, strLogStr, Qt::CaseSensitive) )
+    if ( compResult != 0 )
     {
     QTextStream& tsConsoleStream = *( ( new ConsoleWriterFactory() )->get() );
     tsConsoleStream << strLogStr << endl; // on console
     *this << strLogStr; // in log file
-
-    strLastMessage = strLogStr;
     }
+
+    strLastMessage = strMessage;
 }
 
 
