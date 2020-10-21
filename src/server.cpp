@@ -1074,7 +1074,7 @@ void CServer::DecodeReceiveData ( const int iChanCnt,
          !DoubleFrameSizeConvBufIn[iCurChanID].Get ( vecvecsData[iChanCnt], SYSTEM_FRAME_SIZE_SAMPLES * vecNumAudioChannels[iChanCnt] ) )
     {
         // get current number of OPUS coded bytes
-        const int iCeltNumCodedBytes = vecChannels[iCurChanID].GetNetwFrameSize();
+        const int iCeltNumCodedBytes = vecChannels[iCurChanID].GetCeltNumCodedBytes();
 
         for ( int iB = 0; iB < vecNumFrameSizeConvBlocks[iChanCnt]; iB++ )
         {
@@ -1277,7 +1277,7 @@ void CServer::MixEncodeTransmitData ( const int iChanCnt,
     OpusCustomEncoder* pCurOpusEncoder         = nullptr;
 
     // get current number of CELT coded bytes
-    const int iCeltNumCodedBytes = vecChannels[iCurChanID].GetNetwFrameSize();
+    const int iCeltNumCodedBytes = vecChannels[iCurChanID].GetCeltNumCodedBytes();
 
     // select the opus encoder and raw audio frame length
     if ( vecAudioComprType[iChanCnt] == CT_OPUS )

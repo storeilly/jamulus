@@ -970,7 +970,7 @@
     <message>
         <location filename="../../clientdlg.cpp" line="280"/>
         <source>N&amp;o Channel Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Kanals&amp;ortierung</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="283"/>
@@ -990,7 +990,7 @@
     <message>
         <location filename="../../clientdlg.cpp" line="292"/>
         <source>Sort Channel Users by &amp;City</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortiere die Kanäle nach der &amp;Stadt</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="322"/>
@@ -2571,7 +2571,17 @@
     <message>
         <location filename="../../util.cpp" line="1103"/>
         <source>Mountain Dulcimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Mountain Dulcimer</translation>
+    </message>
+    <message>
+        <location filename="../../util.cpp" line="1104"/>
+        <source>Scratching</source>
+        <translation>Scratcher</translation>
+    </message>
+    <message>
+        <location filename="../../util.cpp" line="1105"/>
+        <source>Rapping</source>
+        <translation>Rapper</translation>
     </message>
     <message>
         <location filename="../../settings.cpp" line="293"/>
@@ -3359,17 +3369,17 @@
 <context>
     <name>QCoreApplication</name>
     <message>
-        <location filename="../../util.cpp" line="1555"/>
+        <location filename="../../util.cpp" line="1557"/>
         <source>, Version </source>
         <translation>, Version </translation>
     </message>
     <message>
-        <location filename="../../util.cpp" line="1568"/>
+        <location filename="../../util.cpp" line="1570"/>
         <source>Internet Jam Session Software</source>
         <translation>Internet Jam Session Software</translation>
     </message>
     <message>
-        <location filename="../../util.cpp" line="1572"/>
+        <location filename="../../util.cpp" line="1574"/>
         <source>Released under the GNU General Public License (GPL)</source>
         <translation>Unter der GNU General Public License (GPL)</translation>
     </message>
