@@ -984,7 +984,7 @@
     <message>
         <location filename="../../clientdlg.cpp" line="280"/>
         <source>N&amp;o Channel Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>S&amp;em Ordenação de Canais</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="283"/>
@@ -1004,7 +1004,7 @@
     <message>
         <location filename="../../clientdlg.cpp" line="292"/>
         <source>Sort Channel Users by &amp;City</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenar os Canais por &amp;Cidade</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="322"/>
@@ -2570,17 +2570,17 @@
     <message>
         <location filename="../../util.cpp" line="1103"/>
         <source>Mountain Dulcimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Saltério dos Apalaches</translation>
     </message>
     <message>
         <location filename="../../util.cpp" line="1104"/>
         <source>Scratching</source>
-        <translation type="unfinished"></translation>
+        <translation>Scratching</translation>
     </message>
     <message>
         <location filename="../../util.cpp" line="1105"/>
         <source>Rapping</source>
-        <translation type="unfinished"></translation>
+        <translation>Rap</translation>
     </message>
     <message>
         <location filename="../../settings.cpp" line="293"/>
@@ -2966,22 +2966,22 @@
         <translation type="vanished">Endereço Predefinido</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="53"/>
+        <location filename="../../serverdlg.h" line="54"/>
         <source>Recording</source>
         <translation>Gravando</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="52"/>
+        <location filename="../../serverdlg.h" line="53"/>
         <source>Not recording</source>
         <translation>Não gravando</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="50"/>
+        <location filename="../../serverdlg.h" line="51"/>
         <source>Not initialised</source>
         <translation>Não inicializado</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="51"/>
+        <location filename="../../serverdlg.h" line="52"/>
         <source>Not enabled</source>
         <translation>Desativado</translation>
     </message>

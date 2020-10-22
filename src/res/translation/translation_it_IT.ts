@@ -436,7 +436,7 @@
     <message>
         <location filename="../../audiomixerboard.cpp" line="231"/>
         <source>GRP</source>
-        <translation type="unfinished">GRP</translation>
+        <translation>GRP</translation>
     </message>
     <message>
         <location filename="../../audiomixerboard.cpp" line="244"/>
@@ -551,12 +551,12 @@
     <message>
         <location filename="../../chatdlg.cpp" line="136"/>
         <source>Do you want to open the link</source>
-        <translation type="unfinished"></translation>
+        <translation>Vuoi che il sia aperto</translation>
     </message>
     <message>
         <location filename="../../chatdlg.cpp" line="137"/>
         <source>in an external browser?</source>
-        <translation type="unfinished"></translation>
+        <translation>sul browser?</translation>
     </message>
 </context>
 <context>
@@ -928,12 +928,12 @@
     <message>
         <location filename="../../clientdlg.cpp" line="280"/>
         <source>N&amp;o Channel Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>N&amp;on Riordinare i Canali</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="292"/>
         <source>Sort Channel Users by &amp;City</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordina i Canali per &amp;Città di provenienza</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="322"/>
@@ -2547,17 +2547,17 @@
     <message>
         <location filename="../../util.cpp" line="1103"/>
         <source>Mountain Dulcimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Dulcimer</translation>
     </message>
     <message>
         <location filename="../../util.cpp" line="1104"/>
         <source>Scratching</source>
-        <translation type="unfinished"></translation>
+        <translation>Scratching</translation>
     </message>
     <message>
         <location filename="../../util.cpp" line="1105"/>
         <source>Rapping</source>
-        <translation type="unfinished"></translation>
+        <translation>Rapping</translation>
     </message>
     <message>
         <location filename="../../settings.cpp" line="293"/>
@@ -2953,22 +2953,22 @@
         <translation type="vanished">Indirizzo Predefinito</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="53"/>
+        <location filename="../../serverdlg.h" line="54"/>
         <source>Recording</source>
         <translation>Registrazione</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="52"/>
+        <location filename="../../serverdlg.h" line="53"/>
         <source>Not recording</source>
         <translation>Registrazione Ferma</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="50"/>
+        <location filename="../../serverdlg.h" line="51"/>
         <source>Not initialised</source>
         <translation>Non inizializato</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="51"/>
+        <location filename="../../serverdlg.h" line="52"/>
         <source>Not enabled</source>
         <translation>Non Abilitata</translation>
     </message>
