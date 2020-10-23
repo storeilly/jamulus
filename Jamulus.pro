@@ -7,11 +7,11 @@ contains(CONFIG, "noupcasename") {
 }
 
 #allow detailed version info in target executable
-contains(CONFIG, "versioninfo") {
+contains(CONFIG, "version_info") {
     message(Using custom target and version)
-    GIT_CURRENT_SHA1=$$system(git describe --tags --abbrev)
-    VERSION = $$VERSION-s-$$GIT_CURRENT_SHA1
-    TARGET = $$TARGET-$$VERSION
+    GIT_HASH=$$system(git describe --tags --abbrev)
+    VERSION = "$$VERSION"_s_$$GIT_HASH
+    TARGET = "$$TARGET"_$$VERSION
     message(Version is $$VERSION)
     message(Target is $$TARGET)
 }
