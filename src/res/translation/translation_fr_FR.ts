@@ -986,7 +986,7 @@
     <message>
         <location filename="../../clientdlg.cpp" line="280"/>
         <source>N&amp;o Channel Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de tri des canaux (&amp;o)</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="283"/>
@@ -1006,7 +1006,7 @@
     <message>
         <location filename="../../clientdlg.cpp" line="292"/>
         <source>Sort Channel Users by &amp;City</source>
-        <translation type="unfinished"></translation>
+        <translation>Trier les utilisateurs du &amp;canal par ville</translation>
     </message>
     <message>
         <location filename="../../clientdlg.cpp" line="322"/>
@@ -2591,17 +2591,17 @@
     <message>
         <location filename="../../util.cpp" line="1103"/>
         <source>Mountain Dulcimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Dulcimer de montagne</translation>
     </message>
     <message>
         <location filename="../../util.cpp" line="1104"/>
         <source>Scratching</source>
-        <translation type="unfinished"></translation>
+        <translation>Scratch</translation>
     </message>
     <message>
         <location filename="../../util.cpp" line="1105"/>
         <source>Rapping</source>
-        <translation type="unfinished"></translation>
+        <translation>Rap</translation>
     </message>
     <message>
         <location filename="../../settings.cpp" line="293"/>
@@ -2987,22 +2987,22 @@
         <translation type="vanished">Adresse prédéfinie</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="54"/>
+        <location filename="../../serverdlg.h" line="56"/>
         <source>Recording</source>
         <translation>Enregistrement</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="53"/>
+        <location filename="../../serverdlg.h" line="55"/>
         <source>Not recording</source>
         <translation>Ne pas enregistrer</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="51"/>
+        <location filename="../../serverdlg.h" line="53"/>
         <source>Not initialised</source>
         <translation>Non initialisé</translation>
     </message>
     <message>
-        <location filename="../../serverdlg.h" line="52"/>
+        <location filename="../../serverdlg.h" line="54"/>
         <source>Not enabled</source>
         <translation>Non activé</translation>
     </message>

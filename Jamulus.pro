@@ -1,4 +1,4 @@
-VERSION = 3.5.12git
+VERSION = 3.6.0git
 
 # use target name which does not use a capital letter at the beginning
 contains(CONFIG, "noupcasename") {
@@ -716,7 +716,7 @@ DISTFILES += ChangeLog \
     src/res/instruments/rapping.png \
     src/res/instruments/recorder.png \
     src/res/instruments/saxophone.png \
-    src/res/instruments/scraching.png \
+    src/res/instruments/scratching.png \
     src/res/instruments/streamer.png \
     src/res/instruments/synthesizer.png \
     src/res/instruments/trombone.png \
