@@ -660,10 +660,16 @@ void CServer::OnNewConnection ( int          iChID,
 /*s*/
     QString logline = "";
     QString IPaddress = "" ;
-    logline += "+[" + QString::number(iChID) +"]" ;               // +[x]
-    logline += ", " + RecHostAddr.InetAddr.toString();             // :x.x.x.x
-    logline += ", " + QString::number(RecHostAddr.iPort);          // :21234
-    logline += vecChannels[iChID].GetName();
+
+    logline += RecHostAddr.InetAddr.toString();             // :x.x.x.x     1 IP
+    logline += ", " ;
+    logline += "+" ;                                                        //2 Action
+    logline += ", " ;
+    logline += QString::number(RecHostAddr.iPort);                // :21234 //3 Port
+    logline += ", " ;
+    logline += "[" + QString::number(iChID) +"]" ;               // +[x]    //4 Slot
+    logline += ", " ;
+    logline += vecChannels[iChID].GetName();                                //5 Name
     Logging.LogMessage( logline );
 //  /*s*/ /*s*/ /*s*/  USRnames.insert(make_pair(IPaddress, "name"));
 
@@ -696,10 +702,15 @@ void CServer::OnCLDisconnection ( CHostAddress InetAddr )
 //        if ( vecChannels[iCurChanID].IsConnected() )
 //        {
             QString logline = "";
-            logline += "-[" + QString::number(iCurChanID) +"]" ;
-            logline += ", " + InetAddr.InetAddr.toString();
-            logline += ", " + QString::number(InetAddr.iPort);
-            logline += ", " + vecChannels[iCurChanID].GetName();
+            logline += InetAddr.InetAddr.toString();                        //1 IP
+            logline += ", " ;
+            logline += "-" ;                                                //2 Action
+            logline += ", " ;
+            logline += QString::number(InetAddr.iPort);                     //3 Port
+            logline += ", " ;
+            logline += "[" + QString::number(iCurChanID) +"]" ;             //4 Slot
+            logline += ", " ;
+            logline += vecChannels[iCurChanID].GetName();                   //5 Name
             Logging.LogMessage( logline );
 //        }
         vecChannels[iCurChanID].Disconnect();
@@ -1383,7 +1394,9 @@ void CServer::CreateAndSendChanListForAllConChannels()
             // send message
             QString straddress;
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
-            straddress = vecChannels[i].GetAddress().toString() + ", ";
+            straddress = vecChannels[i].GetAddress().toString();
+            straddress += ", ";
+            //straddress := vecChannels[i].ine
 //            Logging.LogMessage( "<" + vecChannels[i].GetAddress().toString()  + ">");           /*s*/ /* this gets the ip address and port */
 /*s*/
             Logging.LogMessage( "[" + QString::number(i) + "], " + straddress + vecChannels[i].GetName() );
