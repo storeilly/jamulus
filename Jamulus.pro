@@ -6,6 +6,8 @@ contains(CONFIG, "noupcasename") {
     TARGET = jamulus
 }
 
+#test comment
+
 #allow detailed version info in target executable
 contains(CONFIG, "versioninfo") {
     message(Using custom target and version)
