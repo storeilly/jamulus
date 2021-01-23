@@ -713,6 +713,7 @@ void CServer::OnCLDisconnection ( CHostAddress InetAddr )
             logline += vecChannels[iCurChanID].GetName();                   //5 Name
             Logging.LogMessage( logline );
 //        }
+//test line
         vecChannels[iCurChanID].Disconnect();
     }
 }
