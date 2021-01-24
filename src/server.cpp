@@ -659,7 +659,7 @@ void CServer::OnNewConnection ( int          iChID,
     Logging.AddNewConnection ( RecHostAddr.InetAddr, GetNumberOfConnectedClients() );
 /*s*/
     QString logline = "";
-    QString IPaddress = "" ;
+    QString IPaddress = "";
 
     logline += RecHostAddr.InetAddr.toString();             // :x.x.x.x     1 IP
     logline += ", " ;
@@ -1393,8 +1393,16 @@ void CServer::CreateAndSendChanListForAllConChannels()
         if ( vecChannels[i].IsConnected() )
         {
             // send message
-            QString straddress;
             vecChannels[i].CreateConClientListMes ( vecChanInfo );
+
+            // and log name and address if changed
+            QString straddress;
+            QString logmessage;
+            static QStringList userlist;
+
+            if ( userlist.size == 0 ) ;
+
+
             straddress = vecChannels[i].GetAddress().toString();
             straddress += ", ";
             //straddress := vecChannels[i].ine
