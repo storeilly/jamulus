@@ -1399,22 +1399,29 @@ void CServer::CreateAndSendChanListForAllConChannels()
             QString straddress;
             QString strIP;
             QString strPort;
+            QString strName;
             QString logmessage;
             static QStringList userlist;
 
-            // IP, Action, Port, Slot, Name
+/*s*/
+            //log...  IP, Action, Port, Slot, Name
             straddress = vecChannels[i].GetAddress().toString();
-
             QRegExp rx("(\\:)");
             QStringList query = straddress.split(rx);
             strIP     =  query.at(0);
             strPort   =  query.at(1);
+            strName   =  vecChannels[i].GetName();
 
-            straddress += ", ";
-            //straddress := vecChannels[i].ine
-//            Logging.LogMessage( "<" + vecChannels[i].GetAddress().toString()  + ">");           /*s*/ /* this gets the ip address and port */
-/*s*/
-            Logging.LogMessage( straddress + "[" + QString::number(i) + "], " + straddress + vecChannels[i].GetName() );
+            logmessage  =  strIP;
+            logmessage += ", ";
+            logmessage += "upd";
+            logmessage += ", ";
+            logmessage +=  strPort;
+            logmessage += ", ";
+            logmessage += "[" + QString::number(i) + "]";
+            logmessage += ", ";
+            logmessage +=  strName;
+            Logging.LogMessage( logmessage );
 //            straddress = vecChannels[i].
             vecChanInfo.data();
 /*s*/ /*this here both ip and name*/ /*s*/           // Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
