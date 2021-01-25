@@ -1405,11 +1405,12 @@ void CServer::CreateAndSendChanListForAllConChannels()
             static QStringList userlist;
             int compResult;
 
-/*            while ( userlist.count() < i )
+            while ( userlist.count() < i+1 )
             {
                 userlist.append("---");
             }
-*/
+            Logging.LogMessage( "debug " + QString::number(i) +", " + QString::number(userlist.count()) );
+
             //log...  IP, Action, Port, Slot, Name
             straddress = vecChannels[i].GetAddress().toString();
             QRegExp rx("(\\:)");
@@ -1429,13 +1430,14 @@ void CServer::CreateAndSendChanListForAllConChannels()
             logmessage +=  strName;
 
             //compare if the user has changed before logging!
-            compResult = QString::compare(userlist.at(i), logmessage, Qt::CaseSensitive);
+/*            compResult = QString::compare(userlist.at(i), logmessage, Qt::CaseSensitive);
 
             if ( compResult != 0 )
             {
-                Logging.LogMessage( logmessage );
-//                userlist[i] = logmessage;
+*/                Logging.LogMessage( logmessage );
+/* //                userlist[i] = logmessage;
             }
+*/
 //            straddress = vecChannels[i].
 // hold for later!            vecChanInfo.data();
 /*s*/ /*this here both ip and name*/ /*s*/           // Logging.LogMessage( "[" + QString::number(i) + "], " + vecChannels[i].GetData())
