@@ -1409,7 +1409,7 @@ void CServer::CreateAndSendChanListForAllConChannels()
             {
                 userlist.append("---");
             }
-            Logging.LogMessage( "debug " + QString::number(i) +", " + QString::number(userlist.count()) );
+            Logging.LogMessage( "debug (slot,count,value) " + QString::number(i) +", " + QString::number(userlist.count()) + ", "+userlist.at(i));
 
             //log...  IP, Action, Port, Slot, Name
             straddress = vecChannels[i].GetAddress().toString();
