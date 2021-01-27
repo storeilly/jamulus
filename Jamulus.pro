@@ -1,4 +1,4 @@
-VERSION = 3.6.0
+VERSION = 3.6.2
 
 # use target name which does not use a capital letter at the beginning
 contains(CONFIG, "noupcasename") {
@@ -109,6 +109,11 @@ win32 {
 
         DEFINES += SERVER_BUNDLE
         TARGET = $${TARGET}Server
+        MACOSX_BUNDLE_ICON_FILE = jamulus-server-icon-2020.icns
+        RC_FILE = mac/jamulus-server-icon-2020.icns
+    } else {
+        MACOSX_BUNDLE_ICON_FILE = mainicon.icns
+        RC_FILE = mac/mainicon.icns
     }
 
     QT += macextras
@@ -116,7 +121,6 @@ win32 {
     SOURCES += mac/sound.cpp
     HEADERS += mac/activity.h
     OBJECTIVE_SOURCES += mac/activity.mm
-    RC_FILE = mac/mainicon.icns
     CONFIG += x86
     QMAKE_TARGET_BUNDLE_PREFIX = net.sourceforge.llcon
     QMAKE_APPLICATION_BUNDLE_NAME. = $$TARGET
@@ -682,6 +686,9 @@ DISTFILES += ChangeLog \
     src/res/CLEDRedSmall.png \
     src/res/CLEDYellow.png \
     src/res/CLEDYellowSmall.png \
+    src/res/IndicatorGreen.png \
+    src/res/IndicatorYellow.png \
+    src/res/IndicatorRed.png \
     src/res/faderbackground.png \
     src/res/faderhandle.png \
     src/res/faderhandlesmall.png \
@@ -696,6 +703,7 @@ DISTFILES += ChangeLog \
     src/res/ledbuttonnotpressed.png \
     src/res/ledbuttonpressed.png \
     src/res/fronticon.png \
+    src/res/fronticonserver.png \
     src/res/mixerboardbackground.png \
     src/res/instruments/accordeon.png \
     src/res/instruments/aguitar.png \

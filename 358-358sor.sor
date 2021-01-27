@@ -1,0 +1,122 @@
+diff --git a/Jamulus.pro b/Jamulus.pro
+index 9a750108..57cfdd32 100755
+--- a/Jamulus.pro
++++ b/Jamulus.pro
+@@ -1,4 +1,4 @@
+-VERSION = 3.5.8
++VERSION = 3.5.8sor
+ 
+ # use target name which does not use a captital letter at the beginning
+ contains(CONFIG, "noupcasename") {
+diff --git a/src/server.cpp b/src/server.cpp
+index b958c8fd..8959ee4e 100755
+--- a/src/server.cpp
++++ b/src/server.cpp
+@@ -643,6 +643,12 @@ void CServer::OnNewConnection ( int          iChID,
+ 
+     // logging of new connected channel
+     Logging.AddNewConnection ( RecHostAddr.InetAddr );
++//test code... what do we know?
++    QString logline = "";
++    logline += "+[" + QString::number(iChID) +"]" ;
++    logline += ":" + RecHostAddr.InetAddr.toString();
++    logline += ":" + QString::number(RecHostAddr.iPort);
++    Logging.LogMessage( logline );
+ }
+ 
+ void CServer::OnServerFull ( CHostAddress RecHostAddr )
+@@ -1325,6 +1331,12 @@ void CServer::CreateAndSendChanListForAllConChannels()
+         {
+             // send message
+             vecChannels[i].CreateConClientListMes ( vecChanInfo );
++/*s*/            Logging.LogMessage( QString::number(i) + ":" + vecChannels[i].GetName() );
++//            PutIniSetting ( IniXMLDocument, "clientlist", "clientip",
++//                ToBase64 ( pClient->vecWindowPosMain ) );
++           QMap<QString, int> map;
++           map[]
++
+         }
+     }
+ 
+@@ -1420,10 +1432,10 @@ void CServer::CreateOtherMuteStateChanged ( const int  iCurChanID,
+     }
+ }
+ 
+-int CServer::GetFreeChan()
++int CServer::GetFreeChan( int seed ) /*s*/
+ {
+     // look for a free channel
+-    for ( int i = 0; i < iMaxNumChannels; i++ )
++    for ( int i = seed; i < iMaxNumChannels; i++ )
+     {
+         if ( !vecChannels[i].IsConnected() )
+         {
+@@ -1514,7 +1526,7 @@ bool CServer::PutAudioData ( const CVector<uint8_t>& vecbyRecBuf,
+         if ( iCurChanID == INVALID_CHANNEL_ID )
+         {
+             // a new client is calling, look for free channel
+-            iCurChanID = GetFreeChan();
++/*s*/            iCurChanID = GetFreeChan( 0 );
+ 
+             if ( iCurChanID != INVALID_CHANNEL_ID )
+             {
+diff --git a/src/server.h b/src/server.h
+index bb58dc2d..6605883d 100755
+--- a/src/server.h
++++ b/src/server.h
+@@ -263,7 +263,7 @@ protected:
+     void StartStatusHTMLFileWriting ( const QString& strNewFileName,
+                                       const QString& strNewServerNameWithPort );
+ 
+-    int GetFreeChan();
++    int GetFreeChan( int seed );
+     int FindChannel ( const CHostAddress& CheckAddr );
+     int GetNumberOfConnectedClients();
+     CVector<CChannelInfo> CreateChannelList();
+diff --git a/src/serverlogging.cpp b/src/serverlogging.cpp
+index cdbe4468..fc0e5952 100755
+--- a/src/serverlogging.cpp
++++ b/src/serverlogging.cpp
+@@ -76,6 +76,29 @@ void CServerLogging::AddNewConnection ( const QHostAddress& ClientInetAddr )
+     SvgHistoryGraph.Add ( QDateTime::currentDateTime(), ClientInetAddr );
+ }
+ 
++void CServerLogging::AddDisconnection ( const QHostAddress& ClientInetAddr )
++{
++    // logging of disconnected channel
++    const QString strLogStr = CurTimeDatetoLogString() + ", " +
++        ClientInetAddr.toString() + ", Disconnected";
++
++    QTextStream& tsConsoleStream = *( ( new ConsoleWriterFactory() )->get() );
++    tsConsoleStream << strLogStr << endl; // on console
++    *this << strLogStr; // in log file
++}
++
++void CServerLogging::LogMessage ( const QString& strMessage )
++{
++    // logging of generic string message
++    const QString strLogStr = CurTimeDatetoLogString() + ", " +
++        strMessage + ":";
++
++    QTextStream& tsConsoleStream = *( ( new ConsoleWriterFactory() )->get() );
++    tsConsoleStream << strLogStr << endl; // on console
++    *this << strLogStr; // in log file
++}
++
++
+ void CServerLogging::AddServerStopped()
+ {
+     const QString strLogStr = CurTimeDatetoLogString() + ",, server stopped "
+diff --git a/src/serverlogging.h b/src/serverlogging.h
+index 71587d55..cd89813f 100755
+--- a/src/serverlogging.h
++++ b/src/serverlogging.h
+@@ -51,6 +51,8 @@ public:
+     void Start ( const QString& strLoggingFileName );
+     void EnableHistory ( const QString& strHistoryFileName );
+     void AddNewConnection ( const QHostAddress& ClientInetAddr );
++    void AddDisconnection ( const QHostAddress& ClientInetAddr );
++    void LogMessage ( const QString& strMessage );
+     void AddServerStopped();
+     void ParseLogFile ( const QString& strFileName );
+ 

@@ -29,7 +29,7 @@
 CClientDlg::CClientDlg ( CClient*         pNCliP,
                          CClientSettings* pNSetP,
                          const QString&   strConnOnStartupAddress,
-                         const int        iCtrlMIDIChannel,
+                         const QString&   strMIDISetup,
                          const bool       bNewShowComplRegConnList,
                          const bool       bShowAnalyzerConsole,
                          const bool       bMuteStream,
@@ -38,10 +38,10 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
     pClient             ( pNCliP ),
     pSettings           ( pNSetP ),
     bConnectDlgWasShown ( false ),
-    bMIDICtrlUsed       ( iCtrlMIDIChannel != INVALID_MIDI_CH ),
+    bMIDICtrlUsed       ( !strMIDISetup.isEmpty() ),
     ClientSettingsDlg   ( pNCliP, pNSetP, parent ),
     ChatDlg             ( parent ),
-    ConnectDlg          ( pNCliP, bNewShowComplRegConnList, parent ),
+    ConnectDlg          ( pNSetP, bNewShowComplRegConnList, parent ),
     AnalyzerConsole     ( pNCliP, parent ),
     MusicianProfileDlg  ( pNCliP, parent )
 {
@@ -226,6 +226,9 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
                               tr ( "software upgrade available" ) + "</b></font>" );
     lblUpdateCheck->hide();
 
+    // setup timers
+    TimerCheckAudioDeviceOk.setSingleShot ( true ); // only check once after connection
+
 
     // Connect on startup ------------------------------------------------------
     if ( !strConnOnStartupAddress.isEmpty() )
@@ -239,10 +242,10 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
     // File menu  --------------------------------------------------------------
     QMenu* pFileMenu = new QMenu ( tr ( "&File" ), this );
 
-    pLoadChannelSetupAction = pFileMenu->addAction ( tr ( "&Load Mixer Channels Setup..." ), this,
+    pFileMenu->addAction ( tr ( "&Load Mixer Channels Setup..." ), this,
         SLOT ( OnLoadChannelSetup() ) );
 
-    pSaveChannelSetupAction = pFileMenu->addAction ( tr ( "&Save Mixer Channels Setup..." ), this,
+    pFileMenu->addAction ( tr ( "&Save Mixer Channels Setup..." ), this,
         SLOT ( OnSaveChannelSetup() ) );
 
     pFileMenu->addSeparator();
@@ -277,19 +280,19 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
     // Edit menu  --------------------------------------------------------------
     QMenu* pEditMenu = new QMenu ( tr ( "&Edit" ), this );
 
-    QAction* NoSortAction = pEditMenu->addAction ( tr ( "N&o Channel Sorting" ), this,
+    QAction* NoSortAction = pEditMenu->addAction ( tr ( "N&o User Sorting" ), this,
         SLOT ( OnNoSortChannels() ), QKeySequence ( Qt::CTRL + Qt::Key_O ) );
 
-    QAction* ByNameAction = pEditMenu->addAction ( tr ( "Sort Channel Users by &Name" ), this,
+    QAction* ByNameAction = pEditMenu->addAction ( tr ( "Sort Users by &Name" ), this,
         SLOT ( OnSortChannelsByName() ), QKeySequence ( Qt::CTRL + Qt::Key_N ) );
 
-    QAction* ByInstrAction = pEditMenu->addAction ( tr ( "Sort Channel Users by &Instrument" ), this,
+    QAction* ByInstrAction = pEditMenu->addAction ( tr ( "Sort Users by &Instrument" ), this,
         SLOT ( OnSortChannelsByInstrument() ), QKeySequence ( Qt::CTRL + Qt::Key_I ) );
 
-    QAction* ByGroupAction = pEditMenu->addAction ( tr ( "Sort Channel Users by &Group" ), this,
+    QAction* ByGroupAction = pEditMenu->addAction ( tr ( "Sort Users by &Group" ), this,
         SLOT ( OnSortChannelsByGroupID() ), QKeySequence ( Qt::CTRL + Qt::Key_G ) );
 
-    QAction* ByCityAction = pEditMenu->addAction ( tr ( "Sort Channel Users by &City" ), this,
+    QAction* ByCityAction = pEditMenu->addAction ( tr ( "Sort Users by &City" ), this,
         SLOT ( OnSortChannelsByCity() ), QKeySequence ( Qt::CTRL + Qt::Key_T ) );
 
     // the sorting menu entries shall be checkable and exclusive
@@ -319,8 +322,19 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
 
     pEditMenu->addSeparator();
 
-    pClearAllStoredSoloSettings = pEditMenu->addAction ( tr ( "&Clear All Stored Solo Settings" ), this,
-        SLOT ( OnClearAllStoredSoloSettings() ) );
+    QAction* NumRowsAction = pEditMenu->addAction ( tr ( "Use &Two Rows Mixer Panel" ), this,
+        SLOT ( OnUseTowRowsForMixerPanel ( bool ) ) );
+
+    // initialize the "use two rows for mixer panel" menu entry (is checkable)
+    NumRowsAction->setCheckable ( true );
+    NumRowsAction->setChecked ( pSettings->iNumMixerPanelRows > 1 );
+    MainMixerBoard->SetNumMixerPanelRows ( pSettings->iNumMixerPanelRows );
+
+    pEditMenu->addAction ( tr ( "&Clear All Stored Solo and Mute Settings" ), this,
+        SLOT ( OnClearAllStoredSoloMuteSettings() ) );
+
+    pEditMenu->addAction ( tr ( "Set All Faders to New Client &Level" ), this,
+        SLOT ( OnSetAllFadersToNewClientLevel() ), QKeySequence ( Qt::CTRL + Qt::Key_L ) );
 
 
     // Main menu bar -----------------------------------------------------------
@@ -410,6 +424,9 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
     QObject::connect ( &TimerPing, &QTimer::timeout,
         this, &CClientDlg::OnTimerPing );
 
+    QObject::connect ( &TimerCheckAudioDeviceOk, &QTimer::timeout,
+        this, &CClientDlg::OnTimerCheckAudioDeviceOk );
+
     // sliders
     QObject::connect ( sldAudioPan, &QSlider::valueChanged,
         this, &CClientDlg::OnAudioPanValueChanged );
@@ -430,9 +447,6 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
 
     QObject::connect ( pClient, &CClient::Disconnected,
         this, &CClientDlg::OnDisconnected );
-
-    QObject::connect ( pClient, &CClient::CentralServerAddressTypeChanged,
-        this, &CClientDlg::OnCentralServerAddressTypeChanged );
 
     QObject::connect ( pClient, &CClient::ChatTextReceived,
         this, &CClientDlg::OnChatTextReceived );
@@ -480,11 +494,17 @@ CClientDlg::CClientDlg ( CClient*         pNCliP,
     QObject::connect ( pClient, &CClient::CLVersionAndOSReceived,
         this, &CClientDlg::OnCLVersionAndOSReceived );
 
+    QObject::connect ( pClient, &CClient::SoundDeviceChanged,
+        this, &CClientDlg::OnSoundDeviceChanged );
+
     QObject::connect ( &ClientSettingsDlg, &CClientSettingsDlg::GUIDesignChanged,
         this, &CClientDlg::OnGUIDesignChanged );
 
     QObject::connect ( &ClientSettingsDlg, &CClientSettingsDlg::AudioChannelsChanged,
         this, &CClientDlg::OnAudioChannelsChanged );
+
+    QObject::connect ( &ClientSettingsDlg, &CClientSettingsDlg::CustomCentralServerAddrChanged,
+        &ConnectDlg, &CConnectDlg::OnCustomCentralServerAddrChanged );
 
     QObject::connect ( MainMixerBoard, &CAudioMixerBoard::ChangeChanGain,
         this, &CClientDlg::OnChangeChanGain );
@@ -573,15 +593,44 @@ void CClientDlg::closeEvent ( QCloseEvent* Event )
         pClient->Stop();
     }
 
-    // we have to hide all mixer faders first to initiate a storage of the
-    // current mixer fader levels in case we are just in a connected state
-    MainMixerBoard->HideAll();
+    // make sure all current fader settings are applied to the settings struct
+    MainMixerBoard->StoreAllFaderSettings();
 
     pSettings->bConnectDlgShowAllMusicians = ConnectDlg.GetShowAllMusicians();
     pSettings->eChannelSortType            = MainMixerBoard->GetFaderSorting();
+    pSettings->iNumMixerPanelRows          = MainMixerBoard->GetNumMixerPanelRows();
 
     // default implementation of this event handler routine
     Event->accept();
+}
+
+void CClientDlg::ManageDragNDrop ( QDropEvent* Event,
+                                   const bool  bCheckAccept )
+{
+    // we only want to use drag'n'drop with file URLs
+    QListIterator<QUrl> UrlIterator ( Event->mimeData()->urls() );
+
+    while ( UrlIterator.hasNext() )
+    {
+        const QString strFileNameWithPath = UrlIterator.next().toLocalFile();
+
+        // check all given URLs and if any has the correct suffix
+        if ( !strFileNameWithPath.isEmpty() && ( QFileInfo ( strFileNameWithPath ).suffix() == MIX_SETTINGS_FILE_SUFFIX ) )
+        {
+            if ( bCheckAccept )
+            {
+                // only accept drops of supports file types
+                Event->acceptProposedAction();
+            }
+            else
+            {
+                // load the first valid settings file and leave the loop
+                pSettings->LoadFaderSettings ( strFileNameWithPath );
+                MainMixerBoard->LoadAllFaderSettings();
+                break;
+            }
+        }
+    }
 }
 
 void CClientDlg::UpdateAudioFaderSlider()
@@ -725,18 +774,28 @@ void CClientDlg::OnConnectDisconBut()
     }
 }
 
+void CClientDlg::OnClearAllStoredSoloMuteSettings()
+{
+    // if we are in an active connection, we first have to store all fader settings in
+    // the settings struct, clear the solo and mute states and then apply the settings again
+    MainMixerBoard->StoreAllFaderSettings();
+    pSettings->vecStoredFaderIsSolo.Reset ( false );
+    pSettings->vecStoredFaderIsMute.Reset ( false );
+    MainMixerBoard->LoadAllFaderSettings();
+}
+
 void CClientDlg::OnLoadChannelSetup()
 {
     QString strFileName = QFileDialog::getOpenFileName ( this,
                                                          tr ( "Select Channel Setup File" ),
                                                          "",
-                                                         "*.jch" );
+                                                         QString ( "*." ) + MIX_SETTINGS_FILE_SUFFIX );
 
     if ( !strFileName.isEmpty() )
     {
-// TODO The client has to be stopped to apply recovered settings after re-connect.
-// TODO Should we automatically stop/load/re-start the connection?
+        // first update the settings struct and then update the mixer panel
         pSettings->LoadFaderSettings ( strFileName );
+        MainMixerBoard->LoadAllFaderSettings();
     }
 }
 
@@ -745,25 +804,14 @@ void CClientDlg::OnSaveChannelSetup()
     QString strFileName = QFileDialog::getSaveFileName ( this,
                                                          tr ( "Select Channel Setup File" ),
                                                          "",
-                                                         "*.jch" );
+                                                         QString ( "*." ) + MIX_SETTINGS_FILE_SUFFIX );
 
     if ( !strFileName.isEmpty() )
     {
-// TODO The client has to be stopped to store current faders.
-// TODO Should we automatically stop/save/re-start the connection?
+        // first store all current fader settings (in case we are in an active connection
+        // right now) and then save the information in the settings struct in the file
+        MainMixerBoard->StoreAllFaderSettings();
         pSettings->SaveFaderSettings ( strFileName );
-    }
-}
-
-void CClientDlg::OnCentralServerAddressTypeChanged()
-{
-    // if the server list is shown and the server type was changed, update the list
-    if ( ConnectDlg.isVisible() )
-    {
-        ConnectDlg.SetCentralServerAddress ( NetworkUtil::GetCentralServerAddress ( pClient->GetCentralServerAddressType(),
-                                                                                    pClient->GetServerListCentralServerAddress() ) );
-
-        ConnectDlg.RequestServerList();
     }
 }
 
@@ -779,8 +827,8 @@ void CClientDlg::OnVersionAndOSReceived ( COSUtil::EOpSystemType ,
 #endif
 }
 
-void CClientDlg::OnCLVersionAndOSReceived ( CHostAddress           InetAddr,
-                                            COSUtil::EOpSystemType eOSType,
+void CClientDlg::OnCLVersionAndOSReceived ( CHostAddress           ,
+                                            COSUtil::EOpSystemType ,
                                             QString                strVersion )
 {
     // update check
@@ -791,13 +839,6 @@ void CClientDlg::OnCLVersionAndOSReceived ( CHostAddress           InetAddr,
         lblUpdateCheck->show();
         QTimer::singleShot ( 60000, [this]() { lblUpdateCheck->hide(); } );
     }
-#endif
-
-#ifdef ENABLE_CLIENT_VERSION_AND_OS_DEBUGGING
-    ConnectDlg.SetVersionAndOSType ( InetAddr, eOSType, strVersion );
-#else
-    Q_UNUSED ( InetAddr ) // avoid compiler warnings
-    Q_UNUSED ( eOSType )  // avoid compiler warnings
 #endif
 }
 
@@ -908,11 +949,6 @@ void CClientDlg::SetMyWindowTitle ( const int iNumClients )
 
 void CClientDlg::ShowConnectionSetupDialog()
 {
-    // init the connect dialog
-    ConnectDlg.Init ( pSettings->vstrIPAddress );
-    ConnectDlg.SetCentralServerAddress ( NetworkUtil::GetCentralServerAddress ( pClient->GetCentralServerAddressType(),
-                                                                                pClient->GetServerListCentralServerAddress() ) );
-
     // show connect dialog
     bConnectDlgWasShown = true;
     ConnectDlg.show();
@@ -1076,6 +1112,43 @@ void CClientDlg::OnPingTimeResult ( int iPingTime )
     ledDelay->SetLight ( eOverallDelayLEDColor );
 }
 
+void CClientDlg::OnTimerCheckAudioDeviceOk()
+{
+    // check if the audio device entered the audio callback after a pre-defined
+    // timeout to check if a valid device is selected and if we do not have
+    // fundamental settings errors (in which case the GUI would only show that
+    // it is trying to connect the server which does not help to solve the problem (#129))
+    if ( !pClient->IsCallbackEntered() )
+    {
+        QMessageBox::warning ( this, APP_NAME, tr ( "Your sound card is not working correctly. "
+            "Please open the settings dialog and check the device selection and the driver settings." ) );
+    }
+}
+
+void CClientDlg::OnSoundDeviceChanged ( QString strError )
+{
+    if ( !strError.isEmpty() )
+    {
+        // the sound device setup has a problem, disconnect any active connection
+        if ( pClient->IsRunning() )
+        {
+            Disconnect();
+        }
+
+        // show the error message of the device setup
+        QMessageBox::critical ( this, APP_NAME, strError, tr ( "Ok" ), nullptr );
+    }
+
+    // if the check audio device timer is running, it must be restarted on a device change
+    if ( TimerCheckAudioDeviceOk.isActive() )
+    {
+        TimerCheckAudioDeviceOk.start ( CHECK_AUDIO_DEV_OK_TIME_MS );
+    }
+
+    // update the settings dialog
+    ClientSettingsDlg.UpdateSoundDeviceChannelSelectionFrame();
+}
+
 void CClientDlg::OnCLPingTimeWithNumClientsReceived ( CHostAddress InetAddr,
                                                       int          iPingTime,
                                                       int          iNumClients )
@@ -1099,13 +1172,6 @@ void CClientDlg::Connect ( const QString& strSelectedAddress,
             if ( !pClient->IsRunning() )
             {
                 pClient->Start();
-
-                // menu entries which are disabled during a session
-                pClearAllStoredSoloSettings->setEnabled ( false );
-
-// TODO the client has to be stopped to load/store current faders -> as a quick hack disable menu if running
-pLoadChannelSetupAction->setEnabled ( false );
-pSaveChannelSetupAction->setEnabled ( false );
             }
         }
 
@@ -1123,9 +1189,10 @@ pSaveChannelSetupAction->setEnabled ( false );
         MainMixerBoard->SetServerName ( strMixerBoardLabel );
 
         // start timer for level meter bar and ping time measurement
-        TimerSigMet.start     ( LEVELMETER_UPDATE_TIME_MS );
-        TimerBuffersLED.start ( BUFFER_LED_UPDATE_TIME_MS );
-        TimerPing.start       ( PING_UPDATE_TIME_MS );
+        TimerSigMet.start             ( LEVELMETER_UPDATE_TIME_MS );
+        TimerBuffersLED.start         ( BUFFER_LED_UPDATE_TIME_MS );
+        TimerPing.start               ( PING_UPDATE_TIME_MS );
+        TimerCheckAudioDeviceOk.start ( CHECK_AUDIO_DEV_OK_TIME_MS ); // is single shot timer
     }
 }
 
@@ -1138,13 +1205,6 @@ void CClientDlg::Disconnect()
     if ( pClient->IsRunning() )
     {
         pClient->Stop();
-
-        // menu entries which are disabled during a session
-        pClearAllStoredSoloSettings->setEnabled ( true );
-
-// TODO the client has to be stopped to load/store current faders -> as a quick hack disable menu if running
-pLoadChannelSetupAction->setEnabled ( true );
-pSaveChannelSetupAction->setEnabled ( true );
     }
 
     // change connect button text to "connect"
@@ -1161,6 +1221,7 @@ pSaveChannelSetupAction->setEnabled ( true );
     // stop other timers
     TimerBuffersLED.stop();
     TimerPing.stop();
+    TimerCheckAudioDeviceOk.stop();
 
 
 // TODO is this still required???
@@ -1251,6 +1312,8 @@ rbtReverbSelR->setStyleSheet ( "color: rgb(220, 220, 220);"
 
         lbrInputLevelL->SetLevelMeterType ( CLevelMeter::MT_LED );
         lbrInputLevelR->SetLevelMeterType ( CLevelMeter::MT_LED );
+        ledBuffers->SetType               ( CMultiColorLED::MT_LED );
+        ledDelay->SetType                 ( CMultiColorLED::MT_LED );
         break;
 
     default:
@@ -1265,6 +1328,8 @@ rbtReverbSelR->setStyleSheet ( "" );
 
         lbrInputLevelL->SetLevelMeterType ( CLevelMeter::MT_BAR );
         lbrInputLevelR->SetLevelMeterType ( CLevelMeter::MT_BAR );
+        ledBuffers->SetType               ( CMultiColorLED::MT_INDICATOR );
+        ledDelay->SetType                 ( CMultiColorLED::MT_INDICATOR );
         break;
     }
 

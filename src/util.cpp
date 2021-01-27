@@ -461,6 +461,7 @@ CAboutDlg::CAboutDlg ( QWidget* parent ) : QDialog ( parent )
         "<p>Stanislas Michalak (<a href=""https://github.com/stanislas-m"">stanislas-m</a>)</p>"
         "<p>JP Cimalando (<a href=""https://github.com/jpcima"">jpcima</a>)</p>"
         "<p>Adam Sampson (<a href=""https://github.com/atsampson"">atsampson</a>)</p>"
+        "<p>Jakob Jarmar (<a href=""https://github.com/jarmar"">jarmar</a>)</p>"
         "<p>Stefan Weil (<a href=""https://github.com/stweil"">stweil</a>)</p>"
         "<p>Nils Brederlow (<a href=""https://github.com/dingodoppelt"">dingodoppelt</a>)</p>"
         "<p>Sebastian Krzyszkowiak (<a href=""https://github.com/dos1"">dos1</a>)</p>"
@@ -494,6 +495,7 @@ CAboutDlg::CAboutDlg ( QWidget* parent ) : QDialog ( parent )
         "<p>Volker Fischer (<a href=""https://github.com/corrados"">corrados</a>)</p>"
         "<p><b>" + tr ( "Polish" ) + "</b></p>"
         "<p>Martyna Danysz (<a href=""https://github.com/Martyna27"">Martyna27</a>)</p>"
+        "<p>Tomasz Bojczuk (<a href=""https://github.com/SeeLook"">SeeLook</a>)</p>"
         "<p><b>" + tr ( "Swedish" ) + "</b></p>"
         "<p>Daniel (<a href=""https://github.com/genesisproject2020"">genesisproject2020</a>)</p>"
         "<p><b>" + tr ( "Slovak" ) + "</b></p>"
@@ -981,18 +983,28 @@ bool NetworkUtil::ParseNetworkAddress ( QString       strAddress,
         // that the string contains a valid host name string
         const QHostInfo HostInfo = QHostInfo::fromName ( strAddress );
 
-        if ( HostInfo.error() == QHostInfo::NoError )
-        {
-            // apply IP address to QT object
-             if ( !HostInfo.addresses().isEmpty() )
-             {
-                 // use the first IP address
-                 InetAddr = HostInfo.addresses().first();
-             }
-        }
-        else
+        if ( HostInfo.error() != QHostInfo::NoError )
         {
             return false; // invalid address
+        }
+
+        // use the first IPv4 address, if any
+        bool bFoundIPv4 = false;
+
+        foreach ( const QHostAddress HostAddr, HostInfo.addresses() )
+        {
+            if ( HostAddr.protocol() == QAbstractSocket::IPv4Protocol )
+            {
+               InetAddr   = HostAddr;
+               bFoundIPv4 = true;
+               break;
+            }
+        }
+
+        if ( !bFoundIPv4 )
+        {
+            // only found IPv6 addresses
+            return false;
         }
     }
 
@@ -1517,29 +1529,6 @@ QTextStream* ConsoleWriterFactory::get()
 /******************************************************************************\
 * Global Functions Implementation                                              *
 \******************************************************************************/
-void DebugError ( const QString& pchErDescr,
-                  const QString& pchPar1Descr, 
-                  const double   dPar1,
-                  const QString& pchPar2Descr,
-                  const double   dPar2 )
-{
-    QFile File ( "DebugError.dat" );
-    if ( File.open ( QIODevice::Append ) )
-    {
-        // append new line in logging file
-        QTextStream out ( &File );
-        out << pchErDescr << " ### " <<
-            pchPar1Descr << ": " << QString().setNum ( dPar1, 'f', 2 ) <<
-            " ### " <<
-            pchPar2Descr << ": " << QString().setNum ( dPar2, 'f', 2 ) <<
-            endl;
-
-        File.close();
-    }
-    printf ( "\nDebug error! For more information see test/DebugError.dat\n" );
-    exit ( 1 );
-}
-
 QString GetVersionAndNameStr ( const bool bWithHtml )
 {
     QString strVersionText = "";

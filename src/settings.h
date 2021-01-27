@@ -29,6 +29,9 @@
 #include <QSettings>
 #include <QDir>
 #include <QTextStream>
+#ifndef HEADLESS
+# include <QMessageBox>
+#endif
 #include "global.h"
 #include "client.h"
 #include "server.h"
@@ -145,6 +148,9 @@ public:
         iNewClientFaderLevel        ( 100 ),
         bConnectDlgShowAllMusicians ( true ),
         eChannelSortType            ( ST_NO_SORT ),
+        iNumMixerPanelRows          ( 1 ),
+        vstrCentralServerAddress    ( MAX_NUM_SERVER_ADDR_ITEMS, "" ),
+        eCentralServerAddressType   ( AT_DEFAULT ),
         vecWindowPosSettings        ( ), // empty array
         vecWindowPosChat            ( ), // empty array
         vecWindowPosProfile         ( ), // empty array
@@ -170,6 +176,9 @@ public:
     int              iNewClientFaderLevel;
     bool             bConnectDlgShowAllMusicians;
     EChSortType      eChannelSortType;
+    int              iNumMixerPanelRows;
+    CVector<QString> vstrCentralServerAddress;
+    ECSAddType       eCentralServerAddressType;
 
     // window position/state settings
     QByteArray vecWindowPosSettings;

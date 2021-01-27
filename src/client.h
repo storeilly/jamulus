@@ -28,6 +28,7 @@
 #include <QHostInfo>
 #include <QString>
 #include <QDateTime>
+#include <QMutex>
 #ifdef USE_OPUS_SHARED_LIB
 # include "opus/opus_custom.h"
 #else
@@ -88,14 +89,14 @@
 #define OPUS_NUM_BYTES_MONO_HIGH_QUALITY                    36
 #define OPUS_NUM_BYTES_MONO_LOW_QUALITY_DBLE_FRAMESIZE      25
 #define OPUS_NUM_BYTES_MONO_NORMAL_QUALITY_DBLE_FRAMESIZE   45
-#define OPUS_NUM_BYTES_MONO_HIGH_QUALITY_DBLE_FRAMESIZE     71
+#define OPUS_NUM_BYTES_MONO_HIGH_QUALITY_DBLE_FRAMESIZE     82
 
 #define OPUS_NUM_BYTES_STEREO_LOW_QUALITY                   24
 #define OPUS_NUM_BYTES_STEREO_NORMAL_QUALITY                35
 #define OPUS_NUM_BYTES_STEREO_HIGH_QUALITY                  73
 #define OPUS_NUM_BYTES_STEREO_LOW_QUALITY_DBLE_FRAMESIZE    47
 #define OPUS_NUM_BYTES_STEREO_NORMAL_QUALITY_DBLE_FRAMESIZE 71
-#define OPUS_NUM_BYTES_STEREO_HIGH_QUALITY_DBLE_FRAMESIZE   142
+#define OPUS_NUM_BYTES_STEREO_HIGH_QUALITY_DBLE_FRAMESIZE   165
 
 
 /* Classes ********************************************************************/
@@ -106,7 +107,7 @@ class CClient : public QObject
 public:
     CClient ( const quint16  iPortNumber,
               const QString& strConnOnStartupAddress,
-              const int      iCtrlMIDIChannel,
+              const QString& strMIDISetup,
               const bool     bNoAutoJackConnect,
               const QString& strNClientName,
               const bool     bNMuteMeInPersonalMix );
@@ -116,6 +117,7 @@ public:
     void   Start();
     void   Stop();
     bool   IsRunning() { return Sound.IsRunning(); }
+    bool   IsCallbackEntered() const { return Sound.IsCallbackEntered(); }
     bool   SetServerAddr ( QString strNAddr );
 
     double GetLevelForMeterdBLeft()  { return SignalLevelMeter.GetLevelForMeterdBLeftOrMono(); }
@@ -133,12 +135,6 @@ public:
 
     EAudChanConf GetAudioChannels() const { return eAudioChannelConf; }
     void SetAudioChannels ( const EAudChanConf eNAudChanConf );
-
-    void SetServerListCentralServerAddress ( const QString& sNCentServAddr ) { strCentralServerAddress = sNCentServAddr; }
-    QString GetServerListCentralServerAddress() { return strCentralServerAddress; }
-
-    void SetCentralServerAddressType ( const ECSAddType eNCSAT );
-    ECSAddType GetCentralServerAddressType() { return eCentralServerAddressType; }
 
     int  GetAudioInFader() const { return iAudioInFader; }
     void SetAudioInFader ( const int iNV ) { iAudioInFader = iNV; }
@@ -178,12 +174,10 @@ public:
     int GetUploadRateKbps() { return Channel.GetUploadRateKbps(); }
 
     // sound card device selection
-    int     GetSndCrdNumDev() { return Sound.GetNumDev(); }
-    QString GetSndCrdDeviceName ( const int iDiD )
-        { return Sound.GetDeviceName ( iDiD ); }
+    QStringList GetSndCrdDevNames()  { return Sound.GetDevNames(); }
 
-    QString SetSndCrdDev ( const int iNewDev );
-    int     GetSndCrdDev() { return Sound.GetDev(); }
+    QString SetSndCrdDev ( const QString strNewDev );
+    QString GetSndCrdDev() { return Sound.GetDev(); }
     void    OpenSndCrdDriverSetup() { Sound.OpenDriverSetup(); }
 
     // sound card channel selection
@@ -358,9 +352,7 @@ protected:
 
     bool                    bJitterBufferOK;
     bool                    bNuteMeInPersonalMix;
-
-    QString                 strCentralServerAddress;
-    ECSAddType              eCentralServerAddressType;
+    QMutex                  MutexDriverReinit;
 
     // server settings
     int                     iServerSockBufNumFrames;
@@ -429,6 +421,6 @@ signals:
                                       CVector<uint16_t> vecLevelList );
 
     void Disconnected();
+    void SoundDeviceChanged ( QString strError );
     void ControllerInFaderLevel ( int iChannelIdx, int iValue );
-    void CentralServerAddressTypeChanged();
 };

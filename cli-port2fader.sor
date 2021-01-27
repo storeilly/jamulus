@@ -1,0 +1,21 @@
+I'd like to re-open this issue as I have come up with one possible solution.
+
+If we use the client port as a "key" we can request a fader position by seeding
+ the call to GetFreeChan() with a number requesting a fader position. If that position is occupied
+ the next available is returned as currently but if the iMaxNumChannels is reached and a position
+ is not available (a position too high was requested), then the GetFreeChan calls itself with 0 as a
+ seed value so that normal behavious is restored and free slots are not left unused.
+
+How this will work for a choir is each part will have a designated port to start with see table...
+
+Soprano	-p 22310
+Alto	-p 22320
+Tenor	-p 22330
+Bass	-p 22340
+
+This will allow for 10 of each part before the singers are assigned slots out of sequence. 
+ These values can be configured by the server operator.
+
+This is 4 divisions but more granularity is possible and any failures will roll over to using the default slots
+
+

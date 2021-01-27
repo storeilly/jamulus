@@ -72,22 +72,23 @@ public:
                              const CMultiColorLED::ELightColor eOverallDelayLEDColor );
 
     void UpdateDisplay();
+    void UpdateSoundDeviceChannelSelectionFrame();
 
 protected:
     void    UpdateJitterBufferFrame();
     void    UpdateSoundCardFrame();
-    void    UpdateSoundChannelSelectionFrame();
+    void    UpdateCustomCentralServerComboBox();
     QString GenSndCrdBufferDelayString ( const int     iFrameSize,
                                          const QString strAddText = "" );
 
-    virtual void showEvent ( QShowEvent* ) { UpdateDisplay(); }
+    virtual void showEvent ( QShowEvent* );
 
     CClient*         pClient;
     CClientSettings* pSettings;
     QTimer           TimerStatus;
     QButtonGroup     SndCrdBufferDelayButtonGroup;
 
- public slots:
+public slots:
     void OnTimerStatus() { UpdateDisplay(); }
     void OnNetBufValueChanged ( int value );
     void OnNetBufServerValueChanged ( int value );
@@ -110,4 +111,5 @@ protected:
 signals:
     void GUIDesignChanged();
     void AudioChannelsChanged();
+    void CustomCentralServerAddrChanged();
 };

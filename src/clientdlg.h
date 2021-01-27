@@ -62,6 +62,7 @@
 #define LEVELMETER_UPDATE_TIME_MS   100   // ms
 #define BUFFER_LED_UPDATE_TIME_MS   300   // ms
 #define LED_BAR_UPDATE_TIME_MS      1000  // ms
+#define CHECK_AUDIO_DEV_OK_TIME_MS  5000  // ms
 
 // number of ping times > upper bound until error message is shown
 #define NUM_HIGH_PINGS_UNTIL_ERROR  5
@@ -76,7 +77,7 @@ public:
     CClientDlg ( CClient*         pNCliP,
                  CClientSettings* pNSetP,
                  const QString&   strConnOnStartupAddress,
-                 const int        iCtrlMIDIChannel,
+                 const QString&   strMIDISetup,
                  const bool       bNewShowComplRegConnList,
                  const bool       bShowAnalyzerConsole,
                  const bool       bMuteStream,
@@ -95,6 +96,8 @@ protected:
     void               Connect ( const QString& strSelectedAddress,
                                  const QString& strMixerBoardLabel );
     void               Disconnect();
+    void               ManageDragNDrop ( QDropEvent* Event,
+                                         const bool  bCheckAccept );
 
     CClient*           pClient;
     CClientSettings*   pSettings;
@@ -106,13 +109,12 @@ protected:
     QTimer             TimerBuffersLED;
     QTimer             TimerStatus;
     QTimer             TimerPing;
+    QTimer             TimerCheckAudioDeviceOk;
 
-    virtual void       closeEvent ( QCloseEvent* Event );
+    virtual void       closeEvent     ( QCloseEvent*     Event );
+    virtual void       dragEnterEvent ( QDragEnterEvent* Event ) { ManageDragNDrop ( Event, true ); }
+    virtual void       dropEvent      ( QDropEvent*      Event ) { ManageDragNDrop ( Event, false ); }
     void               UpdateDisplay();
-
-    QAction*           pLoadChannelSetupAction;
-    QAction*           pSaveChannelSetupAction;
-    QAction*           pClearAllStoredSoloSettings;
 
     CClientSettingsDlg ClientSettingsDlg;
     CChatDlg           ChatDlg;
@@ -124,6 +126,7 @@ public slots:
     void OnConnectDisconBut();
     void OnTimerSigMet();
     void OnTimerBuffersLED();
+    void OnTimerCheckAudioDeviceOk();
 
     void OnTimerStatus() { UpdateDisplay(); }
 
@@ -140,8 +143,8 @@ public slots:
     void OnVersionAndOSReceived ( COSUtil::EOpSystemType ,
                                   QString                strVersion );
 
-    void OnCLVersionAndOSReceived ( CHostAddress           InetAddr,
-                                    COSUtil::EOpSystemType eOSType,
+    void OnCLVersionAndOSReceived ( CHostAddress           ,
+                                    COSUtil::EOpSystemType ,
                                     QString                strVersion );
 
     void OnLoadChannelSetup();
@@ -156,7 +159,9 @@ public slots:
     void OnSortChannelsByInstrument() { MainMixerBoard->SetFaderSorting ( ST_BY_INSTRUMENT ); }
     void OnSortChannelsByGroupID()    { MainMixerBoard->SetFaderSorting ( ST_BY_GROUPID ); }
     void OnSortChannelsByCity()       { MainMixerBoard->SetFaderSorting ( ST_BY_CITY ); }
-    void OnClearAllStoredSoloSettings() { pSettings->vecStoredFaderIsSolo.Reset ( false ); }
+    void OnUseTowRowsForMixerPanel ( bool Checked ) { MainMixerBoard->SetNumMixerPanelRows ( Checked ? 2 : 1 ); }
+    void OnClearAllStoredSoloMuteSettings();
+    void OnSetAllFadersToNewClientLevel() { MainMixerBoard->SetAllFaderLevelsToNewClientLevel(); }
 
     void OnSettingsStateChanged ( int value );
     void OnChatStateChanged ( int value );
@@ -176,6 +181,7 @@ public slots:
     void OnConClientListMesReceived ( CVector<CChannelInfo> vecChanInfo );
     void OnChatTextReceived ( QString strChatText );
     void OnLicenceRequired ( ELicenceType eLicenceType );
+    void OnSoundDeviceChanged ( QString strError );
 
     void OnChangeChanGain ( int iId, float fGain, bool bIsMyOwnFader )
         { pClient->SetRemoteChanGain ( iId, fGain, bIsMyOwnFader ); }
@@ -222,7 +228,6 @@ public slots:
 
     void OnConnectDlgAccepted();
     void OnDisconnected() { Disconnect(); }
-    void OnCentralServerAddressTypeChanged();
     void OnGUIDesignChanged() { SetGUIDesign ( pClient->GetGUIDesign() ); }
 
     void OnRecorderStateReceived ( ERecorderState eRecorderState )

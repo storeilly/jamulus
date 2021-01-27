@@ -28,7 +28,7 @@
 /* Implementation *************************************************************/
 CClient::CClient ( const quint16  iPortNumber,
                    const QString& strConnOnStartupAddress,
-                   const int      iCtrlMIDIChannel,
+                   const QString& strMIDISetup,
                    const bool     bNoAutoJackConnect,
                    const QString& strNClientName,
                    const bool     bNMuteMeInPersonalMix ) :
@@ -47,7 +47,7 @@ CClient::CClient ( const quint16  iPortNumber,
     bMuteOutStream                   ( false ),
     fMuteOutStreamGain               ( 1.0f ),
     Socket                           ( &Channel, iPortNumber ),
-    Sound                            ( AudioCallback, this, iCtrlMIDIChannel, bNoAutoJackConnect, strNClientName ),
+    Sound                            ( AudioCallback, this, strMIDISetup, bNoAutoJackConnect, strNClientName ),
     iAudioInFader                    ( AUD_FADER_IN_MIDDLE ),
     bReverbOnLeftChan                ( false ),
     iReverbLevel                     ( 0 ),
@@ -62,8 +62,6 @@ CClient::CClient ( const quint16  iPortNumber,
     bEnableOPUS64                    ( false ),
     bJitterBufferOK                  ( true ),
     bNuteMeInPersonalMix             ( bNMuteMeInPersonalMix ),
-    strCentralServerAddress          ( "" ),
-    eCentralServerAddressType        ( AT_DEFAULT ),
     iServerSockBufNumFrames          ( DEF_NET_BUF_SIZE_NUM_BL ),
     pSignalHandler                   ( CSignalHandler::getSingletonP() )
 {
@@ -209,6 +207,12 @@ CClient::CClient ( const quint16  iPortNumber,
 
 CClient::~CClient()
 {
+    // if we were running, stop sound device
+    if ( Sound.IsRunning() )
+    {
+        Sound.Stop();
+    }
+
     // free audio encoders and decoders
     opus_custom_encoder_destroy ( OpusEncoderMono );
     opus_custom_decoder_destroy ( OpusDecoderMono );
@@ -348,16 +352,6 @@ int CClient::EvaluatePingMessage ( const int iMs )
 {
     // calculate difference between received time in ms and current time in ms
     return PreciseTime.elapsed() - iMs;
-}
-
-void CClient::SetCentralServerAddressType ( const ECSAddType eNCSAT )
-{
-    if ( eCentralServerAddressType != eNCSAT )
-    {
-        // update type and emit message to update the server list, too
-        eCentralServerAddressType = eNCSAT;
-        emit CentralServerAddressTypeChanged();
-    }
 }
 
 void CClient::SetDoAutoSockBufSize ( const bool bValue )
@@ -511,7 +505,7 @@ void CClient::SetAudioChannels ( const EAudChanConf eNAudChanConf )
     }
 }
 
-QString CClient::SetSndCrdDev ( const int iNewDev )
+QString CClient::SetSndCrdDev ( const QString strNewDev )
 {
     // if client was running then first
     // stop it and restart again after new initialization
@@ -521,7 +515,7 @@ QString CClient::SetSndCrdDev ( const int iNewDev )
         Sound.Stop();
     }
 
-    const QString strReturn = Sound.SetDev ( iNewDev );
+    const QString strError = Sound.SetDev ( strNewDev );
 
     // init again because the sound card actual buffer size might
     // be changed on new device
@@ -533,7 +527,13 @@ QString CClient::SetSndCrdDev ( const int iNewDev )
         Sound.Start();
     }
 
-    return strReturn;
+    // in case of an error inform the GUI about it
+    if ( !strError.isEmpty() )
+    {
+        emit SoundDeviceChanged ( strError );
+    }
+
+    return strError;
 }
 
 void CClient::SetSndCrdLeftInputChannel ( const int iNewChan )
@@ -618,39 +618,50 @@ void CClient::SetSndCrdRightOutputChannel ( const int iNewChan )
 
 void CClient::OnSndCrdReinitRequest ( int iSndCrdResetType )
 {
-    // in older QT versions, enums cannot easily be used in signals without
-    // registering them -> workaroud: we use the int type and cast to the enum
-    const ESndCrdResetType eSndCrdResetType =
-        static_cast<ESndCrdResetType> ( iSndCrdResetType );
+    QString strError = "";
 
-    // if client was running then first
-    // stop it and restart again after new initialization
-    const bool bWasRunning = Sound.IsRunning();
-    if ( bWasRunning )
+    // audio device notifications can come at any time and they are in a
+    // different thread, therefore we need a mutex here
+    MutexDriverReinit.lock();
     {
-        Sound.Stop();
-    }
+        // in older QT versions, enums cannot easily be used in signals without
+        // registering them -> workaroud: we use the int type and cast to the enum
+        const ESndCrdResetType eSndCrdResetType =
+            static_cast<ESndCrdResetType> ( iSndCrdResetType );
 
-    // perform reinit request as indicated by the request type parameter
-    if ( eSndCrdResetType != RS_ONLY_RESTART )
-    {
-        if ( eSndCrdResetType != RS_ONLY_RESTART_AND_INIT )
+        // if client was running then first
+        // stop it and restart again after new initialization
+        const bool bWasRunning = Sound.IsRunning();
+        if ( bWasRunning )
         {
-            // reinit the driver if requested
-            // (we use the currently selected driver)
-            Sound.SetDev ( Sound.GetDev() );
+            Sound.Stop();
         }
 
-        // init client object (must always be performed if the driver
-        // was changed)
-        Init();
-    }
+        // perform reinit request as indicated by the request type parameter
+        if ( eSndCrdResetType != RS_ONLY_RESTART )
+        {
+            if ( eSndCrdResetType != RS_ONLY_RESTART_AND_INIT )
+            {
+                // reinit the driver if requested
+                // (we use the currently selected driver)
+                strError = Sound.SetDev ( Sound.GetDev() );
+            }
 
-    if ( bWasRunning )
-    {
-        // restart client
-        Sound.Start();
+            // init client object (must always be performed if the driver
+            // was changed)
+            Init();
+        }
+
+        if ( bWasRunning )
+        {
+            // restart client
+            Sound.Start();
+        }
     }
+    MutexDriverReinit.unlock();
+
+    // inform GUI about the sound card device change
+    emit SoundDeviceChanged ( strError );
 }
 
 void CClient::OnHandledSignal ( int sigNum )

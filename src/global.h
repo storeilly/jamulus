@@ -72,11 +72,6 @@ LED bar:      lbr
 //#define _DEBUG_
 #undef _DEBUG_
 
-// define this macro if the version and operating system debugging shall
-// be enabled in the client (the ping time column in the connect dialog then
-// shows the requested information instead of the ping time)
-#undef ENABLE_CLIENT_VERSION_AND_OS_DEBUGGING
-
 // version and application name (use version from qt prject file)
 #undef VERSION
 #define VERSION                          APP_VERSION
@@ -107,8 +102,8 @@ LED bar:      lbr
 #define CENTSERV_GENRE_CLASSICAL_FOLK    "jamulusclassical.fischvolk.de:22524"
 
 // getting started and software manual URL
-#define CLIENT_GETTING_STARTED_URL       "https://github.com/corrados/jamulus/wiki/Getting-Started"
-#define SERVER_GETTING_STARTED_URL       "https://github.com/corrados/jamulus/wiki/Running-a-Server"
+#define CLIENT_GETTING_STARTED_URL       "https://jamulus.io/wiki/Getting-Started"
+#define SERVER_GETTING_STARTED_URL       "https://jamulus.io/wiki/Running-a-Server"
 #define SOFTWARE_MANUAL_URL              "https://github.com/corrados/jamulus/blob/master/src/res/homepage/manual.md"
 
 // determining server internal address uses well-known host and port
@@ -232,7 +227,7 @@ LED bar:      lbr
 #define MAX_LEN_SERVER_NAME              20
 #define MAX_LEN_IP_ADDRESS               15
 #define MAX_LEN_SERVER_CITY              20
-#define MAX_LEN_VERSION_TEXT             20
+#define MAX_LEN_VERSION_TEXT             30
 
 // common tool tip bottom line text
 #define TOOLTIP_COM_END_TEXT             \
@@ -243,6 +238,9 @@ LED bar:      lbr
 
 // server welcome message title (do not change for compatibility!)
 #define WELCOME_MESSAGE_PREFIX           "<b>Server Welcome Message:</b> "
+
+// mixer settings file name suffix
+#define MIX_SETTINGS_FILE_SUFFIX         "jch"
 
 #define _MAXSHORT                        32767
 #define _MINSHORT                        ( -32768 )

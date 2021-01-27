@@ -64,6 +64,9 @@ private network.
 #include <QList>
 #include <QElapsedTimer>
 #include <QMutex>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+# include <QVersionNumber>
+#endif
 #include "global.h"
 #include "util.h"
 #include "protocol.h"
@@ -145,13 +148,8 @@ public:
 
     void CentralServerRegisterServer ( const CHostAddress&    InetAddr,
                                        const CHostAddress&    LInetAddr,
-                                       const CServerCoreInfo& ServerInfo );
-
-    void CentralServerRegisterServerEx ( const CHostAddress&          InetAddr,
-                                         const CHostAddress&          LInetAddr,
-                                         const CServerCoreInfo&       ServerInfo,
-                                         const COSUtil::EOpSystemType ,
-                                         const QString&               );
+                                       const CServerCoreInfo& ServerInfo,
+                                       const QString          strVersion = "" );
 
     void CentralServerUnregisterServer ( const CHostAddress& InetAddr );
 
@@ -205,6 +203,7 @@ protected:
     CHostAddress            SlaveCurLocalHostAddress;
 
     QList<QHostAddress>     vWhiteList;
+    QString                 strMinServerVersion;
 
     CProtocol*              pConnLessProtocol;
 

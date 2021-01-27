@@ -489,10 +489,10 @@ public slots:
     void OnCLRegisterServerExReceived ( CHostAddress           InetAddr,
                                         CHostAddress           LInetAddr,
                                         CServerCoreInfo        ServerInfo,
-                                        COSUtil::EOpSystemType eOSType,
+                                        COSUtil::EOpSystemType ,
                                         QString                strVersion )
     {
-        ServerListManager.CentralServerRegisterServerEx ( InetAddr, LInetAddr, ServerInfo, eOSType, strVersion );
+        ServerListManager.CentralServerRegisterServer ( InetAddr, LInetAddr, ServerInfo, strVersion );
     }
 
     void OnCLRegisterServerResp ( CHostAddress  /* unused */,

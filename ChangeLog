@@ -1,11 +1,59 @@
 
 
 
-3.6.0git <- NOTE: the release version number will be 3.6.1
+3.6.2git <- NOTE: the release version number will be 3.6.3
 
 
 
 
+3.6.2 (2020-12-12)
+
+- change Clear All Stored Solo Settings to clear Mute as well (#731)
+
+- avoid selecting IPv6 results from hostname lookup, coded by jarmar (#722)
+
+- added possibility to set MIDI offset for fader control to --ctrlmidich (#95)
+
+- detect if no audio Device is selected before trying to connect a server (#129)
+
+- on MacOS if an audio device is no longer available, show a warning
+  rather than switching to default automatically (#727)
+
+- bug fix: sliders move by themselves if fader groups are used on reconnect (#611)
+
+- bug fix: do not reset sound card channel selection on a device property change (#727)
+
+- bug fix: compiling Jamulus 3.6.1 is failing on Debian 9 Linode (#736)
+
+- bug fix: on MacOS Jamulus does not always select the previous sound card (#680)
+
+- bug fix: use new server icon on Mac server bundle and Windows installer (#737)
+
+- bug fix: ping times of servers which are further down the server list are too high (#49)
+
+
+3.6.1 (2020-11-21)
+
+- added menu entry "Set All Faders to New Client Level" (#622)
+
+- isolate a channel from the group temporarily with shift-click-drag (#695)
+
+- on shift-click the pan reset to 0 L/R (#707)
+
+- support multiple custom central server addresses (#698)
+
+- the Jamulus server now has a different icon, created by geheimerEichkater (#700)
+
+- support two rows for the mixer panel (#720)
+
+- changed RYG indicator lights with colour-blind compensation, created by geheimerEichkater (#57)
+
+- saving and loading mixer settings is now possible during an active connection and a
+  mixer settings file can be loaded with drag'n'drop (#706)
+
+- menu entry Clear All Stored Solo Settings is now enabled during an active connection
+
+- bug fix: the fader group property was not correctly loaded from the ini file
 
 
 3.6.0 (2020-10-25)
@@ -33,7 +81,7 @@
 
 - replaced double types by floats for some of the signal processing, coded by hselasky (#544)
 
-- support permanent channl fader sorting (i.e., not only on request but always) (#666)
+- support permanent channel fader sorting (i.e., not only on request but always) (#666)
 
 - support sorting faders by channel city
 

@@ -1,0 +1,13 @@
+Working with a large choir, it is easier if the singers' faders are all grouped and in the same order, it is also useful if everyone's view of that is the same which is why I prefer a server side solution to this.
+
+I have come up with a concept of using the client source port to request a
+particular position on the mixer board if the server is configured to respond
+to it. I've created a pull request for review and comment to see if this is
+workable. The code accepts the client source port and subtracts it from the
+server parameter for starting port set by the server operator. The server will then try to assign the first available fader position greater than that number to the client at first connect. If it cannot assign a position and there are still available slots on the server, the server will then assign the lowest available slot as it does currently.
+
+My concept requires all members of the choir to add the "-p xxxx" parameter similar to the following
+Jamulus -p 22300 (for Sopranos)
+Jamulus -p 22310 (for Altos)
+..... etc..
+This numbering gives 10 slots for each group. Alternative numbering systems will also work.

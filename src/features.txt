@@ -1,0 +1,9 @@
+Send text message on.....
+    new connection : server.cpp - 597 ~
+log disconnects
+    connects.. server.cpp 553
+
+
+User name.. see     QString ChanName = vecChannels[iCurChanID].GetName(); in server.cpp line 1286
+
+Client order... see server.cpp 1327 int CServer::GetFreeChan()
