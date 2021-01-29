@@ -35,3 +35,15 @@ distributions/jack2
 distributions/claudio_piano.sf2
 distributions/fluidsynth*
 distributions/jamulus.desktop
+ASIOSDK2.3.2
+/*.sor
+/sync.cmd
+/src/features.txt
+/src/*.bak
+/ChangeLog.bak
+build-Jamulus-Desktop_Qt_5_9_9_MinGW_32bit-Debug
+ChangeLog.bak
+chlog.txt
+ClientPort2FaderPosition.txt
+Jamulus.pro.bak
+/*.$$$
