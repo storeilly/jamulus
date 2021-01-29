@@ -664,6 +664,7 @@ void CServer::OnNewConnection ( int          iChID,
     logline += RecHostAddr.InetAddr.toString();             // :x.x.x.x     1 IP
     logline += ", " ;
     logline += "+" ;                                                        //2 Action
+    logline += " ("+ QString::number(GetNumberOfConnectedClients()) + ")";
     logline += ", " ;
     logline += QString::number(RecHostAddr.iPort);                // :21234 //3 Port
     logline += ", " ;
@@ -705,6 +706,7 @@ void CServer::OnCLDisconnection ( CHostAddress InetAddr )
             logline += InetAddr.InetAddr.toString();                        //1 IP
             logline += ", " ;
             logline += "-" ;                                                //2 Action
+            logline += " ("+ QString::number(GetNumberOfConnectedClients()) + ")";
             logline += ", " ;
             logline += QString::number(InetAddr.iPort);                     //3 Port
             logline += ", " ;
@@ -1402,6 +1404,8 @@ void CServer::CreateAndSendChanListForAllConChannels()
             QString strPort;
             QString strName;
             QString logmessage;
+            QString logmessage2;
+            QString usercount;
             static QStringList userlist;
             int compResult;
 
@@ -1422,20 +1426,21 @@ void CServer::CreateAndSendChanListForAllConChannels()
             logmessage  =  strIP;
             logmessage += ", ";
             logmessage += "upd";
-            logmessage += ", ";
-            logmessage +=  strPort;
-            logmessage += ", ";
-            logmessage += "[" + QString::number(i) + "]";
-            logmessage += ", ";
-            logmessage +=  strName;
+            usercount = " ("+ QString::number( GetNumberOfConnectedClients() ) + ")";
+            logmessage2 += ", ";
+            logmessage2 +=  strPort;
+            logmessage2 += ", ";
+            logmessage2 += "[" + QString::number(i) + "]";
+            logmessage2 += ", ";
+            logmessage2 +=  strName;
 
             //compare if the user has changed before logging!
-            compResult = QString::compare(userlist[i], logmessage, Qt::CaseSensitive);
+            compResult = QString::compare(userlist[i], logmessage + logmessage2, Qt::CaseSensitive);
 
             if ( compResult != 0 )
             {
-                Logging.LogMessage( logmessage );
-                userlist[i] = logmessage;
+                Logging.LogMessage( logmessage + usercount + logmessage2 );
+                userlist[i] = logmessage + logmessage2;
             }
 
 //            straddress = vecChannels[i].
